@@ -31,6 +31,8 @@ server.post('/challenge', ({ body }) => {
   return {};
 });
 
+server.get('/hello', () => 'Which Karn?');
+
 export const Server = {
   start: async () => {
     try {
