@@ -1,4 +1,4 @@
-const CALLBACK_URL = 'https://diskarn.railway.com/challenge';
+const CALLBACK_URL = 'https://diskarn.up.railway.app/challenge';
 const HUB_URL = 'https://pubsubhubbub.appspot.com';
 const TOPIC_URL = 'https://www.youtube.com/xml/feeds/videos.xml?channel_id=';
 
