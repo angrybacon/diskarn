@@ -8,17 +8,17 @@
   "version": "0.1.0",
   "scripts": {
     "build": "tsc",
-    "dev": "tsx watch src/index.ts",
+    "dev": "dotenvx run --convention=nextjs -- tsx watch src/index.ts",
     "lint": "pnpm run '/^lint:[^:]+$/'",
     "lint:format": "prettier --check src/",
     "lint:typings": "tsc --noEmit",
-    "start": "node ."
+    "start": "dotenvx run --convention=nextjs -- node ."
   },
   "dependencies": {
     "@discordeno/bot": "19.0.0-next.76ad81d",
-    "dotenv": "16.4.5",
+    "@dotenvx/dotenvx": "1.20.0",
     "fastify": "5.0.0",
-    "xml-js": "^1.6.11"
+    "xml-js": "1.6.11"
   },
   "devDependencies": {
     "@ianvs/prettier-plugin-sort-imports": "4.3.1",

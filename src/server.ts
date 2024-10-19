@@ -3,12 +3,9 @@ import { xml2json } from 'xml-js';
 
 import { Bot } from './bot';
 
-const PORT = 3333;
-const PATH = '/challenge';
-
 const server = Fastify({ logger: true });
 
-server.get(PATH, {
+server.get('/challenge', {
   handler: ({ query }) => {
     const challenge = (query as { 'hub.challenge': string })['hub.challenge'];
     console.log(`[server] Verification challenge received "${challenge}"`);
@@ -23,31 +20,22 @@ server.get(PATH, {
   },
 });
 
-server.post(PATH, ({ body }) => {
+server.post('/challenge', ({ body }) => {
   console.log(`[server] Received WebSub "${JSON.stringify(body)}"`);
-  Bot.write(`Raw
-\`\`\`
-${body}
-\`\`\``);
-  Bot.write(`Raw (stringified)
-\`\`\`
-${JSON.stringify(body, null, 2)}
-\`\`\``);
-  Bot.write(`JSON (default)
-\`\`\`
-${xml2json(body as string)}
-\`\`\``);
-  Bot.write(`JSON (compact)
-\`\`\`
-${xml2json(body as string, { compact: true })}
-\`\`\``);
+  Bot.write('# Raw', [body as string, { pre: true }]);
+  Bot.write('# JSON (default)', [xml2json(body as string), { pre: true }]);
+  Bot.write('# JSON (compact)', [
+    xml2json(body as string, { compact: true }),
+    { pre: true },
+  ]);
   return {};
 });
 
 export const Server = {
   start: async () => {
     try {
-      const address = await server.listen({ port: PORT });
+      if (!process.env.PORT) throw new Error('Could not find port to use');
+      const address = await server.listen({ port: parseInt(process.env.PORT) });
       server.log.info(`Server running on ${address}`);
     } catch (error) {
       server.log.error(error);
