@@ -1,9 +1,22 @@
 import Fastify from 'fastify';
-import { xml2json } from 'xml-js';
+import { xml2js } from 'xml-js';
 
 import { Bot } from './bot';
 
-const server = Fastify({ logger: true });
+const server = Fastify();
+
+server.addContentTypeParser(
+  'application/atom+xml',
+  { parseAs: 'buffer' },
+  (_request, body, done) => {
+    try {
+      const data = xml2js(body.toString(), { compact: true });
+      done(null, data);
+    } catch (error) {
+      done(error instanceof Error ? error : new Error(`${error}`));
+    }
+  },
+);
 
 server.get('/challenge', {
   handler: ({ query }) => {
@@ -22,12 +35,16 @@ server.get('/challenge', {
 
 server.post('/challenge', ({ body }) => {
   console.log(`[server] Received WebSub "${JSON.stringify(body)}"`);
-  Bot.write('# Raw', [body as string, { pre: true }]);
-  Bot.write('# JSON (default)', [xml2json(body as string), { pre: true }]);
-  Bot.write('# JSON (compact)', [
-    xml2json(body as string, { compact: true }),
-    { pre: true },
-  ]);
+  Bot.write(
+    '# Raw (stringified)',
+    [`Typeof: ${typeof body}`, { pre: true }],
+    [JSON.stringify(body, null, 2), { pre: true }],
+  );
+  Bot.write(
+    '# Raw',
+    [`Typeof: ${typeof body}`, { pre: true }],
+    [body as string, { pre: true }],
+  );
   return {};
 });
 

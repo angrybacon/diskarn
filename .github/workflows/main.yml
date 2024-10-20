@@ -1,0 +1,24 @@
+name: Main
+
+on: push
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up PNPM
+        uses: pnpm/action-setup@v3
+        with:
+          version: latest
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          cache: 'pnpm'
+          node-version-file: 'package.json'
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Run lint tasks
+        run: pnpm lint
