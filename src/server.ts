@@ -18,10 +18,18 @@ server.addContentTypeParser(
   },
 );
 
+server.addHook('onError', async (request, _reply, error) => {
+  const message = await Bot.write(`\`${request.method} ${request.url}\``, [
+    error.message,
+    { pre: true },
+  ]);
+  console.info('[server] Wrote an error', JSON.stringify(message, null, 2));
+});
+
 server.get('/challenge', {
   handler: ({ query }) => {
     const challenge = (query as { 'hub.challenge': string })['hub.challenge'];
-    console.log(`[server] Verification challenge received "${challenge}"`);
+    console.info(`[server] Verification challenge received "${challenge}"`);
     return challenge;
   },
   schema: {
@@ -34,17 +42,8 @@ server.get('/challenge', {
 });
 
 server.post('/challenge', ({ body }) => {
-  console.log(`[server] Received WebSub "${JSON.stringify(body)}"`);
-  Bot.write(
-    '# Raw (stringified)',
-    [`Typeof: ${typeof body}`, { pre: true }],
-    [JSON.stringify(body, null, 2), { pre: true }],
-  );
-  Bot.write(
-    '# Raw',
-    [`Typeof: ${typeof body}`, { pre: true }],
-    [body as string, { pre: true }],
-  );
+  console.info(`[server] Received WebSub ${JSON.stringify(body, null, 2)}`);
+  Bot.write([JSON.stringify(body, null, 2), { pre: true }]);
   return {};
 });
 

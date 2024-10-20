@@ -35,5 +35,9 @@ export const Bot = {
   start: () => bot.start(),
   stop: () => bot.shutdown(),
   write: (...lines: [Line, ...Line[]]) =>
-    bot.helpers.sendMessage(CHANNELS.LOGS, { content: lines.join('\n') }),
+    bot.helpers.sendMessage(CHANNELS.LOGS, {
+      content: lines
+        .map((it) => (typeof it === 'string' ? it : `\`\`\`${it[0]}\`\`\``))
+        .join('\n'),
+    }),
 } as const;

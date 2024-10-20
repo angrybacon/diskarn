@@ -15,13 +15,14 @@ const main = async () => {
   let index = 0;
   for (const [name, id] of Object.entries(CHANNELS)) {
     const total = Object.keys(CHANNELS).length;
-    console.log(`Subscribing ${++index}/${total} "${name}"...`);
+    console.info(`Subscribing ${++index}/${total} "${name}"...`);
+    // TODO Refresh subscriptions automatically
     // NOTE Await in between as a cheap way not to care about rate limits
     const response = await subscribe({ id });
     if (!response.ok) {
       throw new Error(`${response.status} ${response.statusText}`);
     }
-    console.log(`Subscribed "${name}"`);
+    console.info(`Subscribed "${name}"`);
   }
 };
 
