@@ -81,6 +81,7 @@ server.post('/challenge', ({ body }) => {
       `- Updated: \`${updated}\``,
       [JSON.stringify(entry, null, 2), { raw: 'json' }],
     );
+    Bot.post(entry.title, entry.link);
   } catch (error) {
     const message = error instanceof Error ? error.message : `${error}`;
     console.info(`[server] Could not read WebSub notification`);

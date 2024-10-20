@@ -27,6 +27,7 @@ const bot = createBot({
 type Line = string | [text: string, options: { raw: string }];
 
 export const Bot = {
+  // TODO Probably want this to also the console by default
   log: (...lines: [Line, ...Line[]]) =>
     bot.helpers.sendMessage(CHANNELS.LOGS, {
       content: lines
