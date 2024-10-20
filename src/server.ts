@@ -39,19 +39,17 @@ server.get('/challenge', {
   },
 });
 
-const zLink = z
-  .object({ _attributes: z.object({ href: z.string() }) })
-  .transform((it) => it._attributes.href);
-
 const zText = z.object({ _text: z.string() }).transform((it) => it._text);
 
 const zNotification = z.object({
   feed: z.object({
     entry: z
       .object({
-        author: z.object({ name: zText, uri: zText }),
+        author: z.object({ name: zText }).transform((it) => it.name),
         id: zText,
-        link: zLink,
+        link: z
+          .object({ _attributes: z.object({ href: z.string() }) })
+          .transform((it) => it._attributes.href),
         published: zText,
         title: zText,
         updated: zText,
