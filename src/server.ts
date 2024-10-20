@@ -36,8 +36,12 @@ server.get('/hello', () => 'Which Karn?');
 export const Server = {
   start: async () => {
     try {
+      if (!process.env.HOST) throw new Error('Could not find host to use');
       if (!process.env.PORT) throw new Error('Could not find port to use');
-      const address = await server.listen({ port: parseInt(process.env.PORT) });
+      const address = await server.listen({
+        host: process.env.HOST,
+        port: parseInt(process.env.PORT),
+      });
       server.log.info(`Server running on ${address}`);
     } catch (error) {
       server.log.error(error);
