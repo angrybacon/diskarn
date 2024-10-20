@@ -21,7 +21,7 @@ server.addContentTypeParser(
 server.addHook('onError', async (request, _reply, error) => {
   const message = await Bot.write(`\`${request.method} ${request.url}\``, [
     error.message,
-    { pre: true },
+    { raw: 'raw' },
   ]);
   console.info('[server] Wrote an error', JSON.stringify(message, null, 2));
 });
@@ -43,7 +43,7 @@ server.get('/challenge', {
 
 server.post('/challenge', ({ body }) => {
   console.info(`[server] Received WebSub ${JSON.stringify(body, null, 2)}`);
-  Bot.write([JSON.stringify(body, null, 2), { pre: true }]);
+  Bot.write([JSON.stringify(body, null, 2), { raw: 'json' }]);
   return {};
 });
 

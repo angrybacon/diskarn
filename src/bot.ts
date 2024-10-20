@@ -10,8 +10,6 @@ const CHANNELS = {
   VIDEOS: '1294371636094701670',
 } as const;
 
-type Line = string | [text: string, options: { pre: true }];
-
 const bot = createBot({
   events: {
     ready({ applicationId, sessionId }) {
@@ -25,6 +23,8 @@ const bot = createBot({
   token: process.env.TOKEN,
 });
 
+type Line = string | [text: string, options: { raw: string }];
+
 export const Bot = {
   post: (name: string, content: string) =>
     bot.helpers.createForumThread(CHANNELS.VIDEOS, {
@@ -37,7 +37,11 @@ export const Bot = {
   write: (...lines: [Line, ...Line[]]) =>
     bot.helpers.sendMessage(CHANNELS.LOGS, {
       content: lines
-        .map((it) => (typeof it === 'string' ? it : `\`\`\`${it[0]}\`\`\``))
+        .map((line) => {
+          if (typeof line === 'string') return line;
+          const [text, options] = line;
+          return `\`\`\`${options.raw}\n${text}\n\`\`\``;
+        })
         .join('\n'),
     }),
 } as const;
