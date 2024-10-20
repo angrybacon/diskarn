@@ -3,8 +3,16 @@
 
 [[./LICENSE.org][https://img.shields.io/github/license/angrybacon/diskarn.svg?style=flat-square]]
 
+** Preamble
+
 I find it very irritating that Discord bots lure you with promising features and
 progressively hide them behind a paywall and so Diskarn will be my playground to
 provide said features for my own use. We're all consenting adults, read the
 licensing, read the source and adjust your expectations if you want to test it
 out yourself.
+
+** How Does It Work?
+
+- =bot= :: Handles the connection to your Discord server
+- =karnnect= :: Subscribe to YouTube /WebSub/, no polling here
+- =server= :: Handle the /WebSub/ notifications

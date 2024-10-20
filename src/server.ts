@@ -1,5 +1,6 @@
 import Fastify from 'fastify';
 import { xml2js } from 'xml-js';
+import { z } from 'zod';
 
 import { Bot } from './bot';
 
@@ -18,12 +19,9 @@ server.addContentTypeParser(
   },
 );
 
-server.addHook('onError', async (request, _reply, error) => {
-  const message = await Bot.write(`\`${request.method} ${request.url}\``, [
-    error.message,
-    { raw: 'raw' },
-  ]);
-  console.info('[server] Wrote an error', JSON.stringify(message, null, 2));
+server.addHook('onError', (_request, _reply, error) => {
+  console.info(`[server] An error occured "${error.message}"`);
+  return Bot.log('# An error occured', [error.message, { raw: 'raw' }]);
 });
 
 server.get('/challenge', {
@@ -41,9 +39,59 @@ server.get('/challenge', {
   },
 });
 
+const zLink = z
+  .object({ _attributes: z.object({ href: z.string() }) })
+  .transform((it) => it._attributes.href);
+
+const zText = z.object({ _text: z.string() }).transform((it) => it._text);
+
+const zNotification = z.object({
+  feed: z.object({
+    entry: z
+      .object({
+        author: z.object({ name: zText, uri: zText }),
+        id: zText,
+        link: zLink,
+        published: zText,
+        title: zText,
+        updated: zText,
+        'yt:channelId': zText,
+        'yt:videoId': zText,
+      })
+      .transform(
+        ({ 'yt:channelId': channelId, 'yt:videoId': videoId, ...it }) => ({
+          ...it,
+          channelId,
+          videoId,
+        }),
+      ),
+    title: zText,
+    updated: zText,
+  }),
+});
+
 server.post('/challenge', ({ body }) => {
-  console.info(`[server] Received WebSub ${JSON.stringify(body, null, 2)}`);
-  Bot.write([JSON.stringify(body, null, 2), { raw: 'json' }]);
+  try {
+    const { feed } = zNotification.parse(body);
+    console.info(`[server] Received WebSub ${JSON.stringify(feed, null, 2)}`);
+    const { entry, title, updated } = feed;
+    Bot.log(
+      '# Received WebSub',
+      `- Title: \`${title}\``,
+      `- Updated: \`${updated}\``,
+      [JSON.stringify(entry, null, 2), { raw: 'json' }],
+    );
+  } catch (error) {
+    const message = error instanceof Error ? error.message : `${error}`;
+    console.info(`[server] Could not read WebSub notification`);
+    console.info(message);
+    console.info(JSON.stringify(body, null, 2));
+    Bot.log(
+      '# Could not read WebSub notification',
+      [message, { raw: 'json' }],
+      [JSON.stringify(body, null, 2), { raw: 'json' }],
+    );
+  }
   return {};
 });
 

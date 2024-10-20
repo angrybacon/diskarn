@@ -18,7 +18,8 @@
     "@discordeno/bot": "19.0.0-next.76ad81d",
     "@dotenvx/dotenvx": "1.20.0",
     "fastify": "5.0.0",
-    "xml-js": "1.6.11"
+    "xml-js": "1.6.11",
+    "zod": "3.23.8"
   },
   "devDependencies": {
     "@ianvs/prettier-plugin-sort-imports": "4.3.1",

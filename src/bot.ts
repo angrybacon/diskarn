@@ -14,7 +14,8 @@ const bot = createBot({
   events: {
     ready({ applicationId, sessionId }) {
       console.info(`[bot] Session is ready "${sessionId}"`);
-      Bot.write(
+      Bot.log(
+        '# Session is ready',
         `- Application: \`${applicationId}\``,
         `- Session: \`${sessionId}\``,
       );
@@ -26,15 +27,7 @@ const bot = createBot({
 type Line = string | [text: string, options: { raw: string }];
 
 export const Bot = {
-  post: (name: string, content: string) =>
-    bot.helpers.createForumThread(CHANNELS.VIDEOS, {
-      autoArchiveDuration: 10080,
-      message: { content },
-      name,
-    }),
-  start: () => bot.start(),
-  stop: () => bot.shutdown(),
-  write: (...lines: [Line, ...Line[]]) =>
+  log: (...lines: [Line, ...Line[]]) =>
     bot.helpers.sendMessage(CHANNELS.LOGS, {
       content: lines
         .map((line) => {
@@ -44,4 +37,12 @@ export const Bot = {
         })
         .join('\n'),
     }),
+  post: (name: string, content: string) =>
+    bot.helpers.createForumThread(CHANNELS.VIDEOS, {
+      autoArchiveDuration: 10080,
+      message: { content },
+      name,
+    }),
+  start: () => bot.start(),
+  stop: () => bot.shutdown(),
 } as const;
