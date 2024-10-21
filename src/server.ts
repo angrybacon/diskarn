@@ -20,8 +20,8 @@ server.addContentTypeParser(
 );
 
 server.addHook('onError', (_request, _reply, error) => {
-  console.info(`[server] An error occured "${error.message}"`);
-  return Bot.write('# An error occured', [error.message, { raw: 'raw' }]);
+  console.error(`[server] An error occurred "${error.message}"`);
+  return Bot.error('An error occurred', error.message);
 });
 
 server.get('/challenge', {
@@ -84,10 +84,10 @@ server.post('/challenge', ({ body }) => {
     Bot.post(entry.title, entry.link);
   } catch (error) {
     const message = error instanceof Error ? error.message : `${error}`;
-    console.info(`[server] Could not read WebSub notification`);
-    console.info(message);
-    console.info(JSON.stringify(body, null, 2));
-    Bot.log({ body: message, title: 'Could not read WebSub notification' });
+    console.error(`[server] Could not read WebSub notification`);
+    console.error(message);
+    console.error(JSON.stringify(body, null, 2));
+    Bot.error('Could not read WebSub notification', message);
   }
   return {};
 });

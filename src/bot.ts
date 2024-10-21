@@ -20,37 +20,41 @@ const bot = createBot({
   token: process.env.TOKEN,
 });
 
+const log = (options: {
+  body?: string | [string, ...string[]];
+  color?: number;
+  fields?: [name: string, value: string][];
+  footer?: string;
+  timestamp?: string;
+  title?: string;
+}) =>
+  bot.helpers.sendMessage(CHANNELS.LOGS, {
+    embeds: [
+      {
+        color: options.color || 0x607d8b,
+        description: (Array.isArray(options.body)
+          ? options.body
+          : [options.body]
+        ).join('\n'),
+        fields: options.fields?.map(([name, value]) => ({
+          inline: true,
+          name,
+          value,
+        })),
+        timestamp: options.timestamp || new Date().toISOString(),
+        title: options.title,
+        ...(options.footer && { text: options.footer }),
+      },
+    ],
+  });
+
 type Line = string | [text: string, options: { raw: string }];
 
 export const Bot = {
-  log: (options: {
-    body?: string | [string, ...string[]];
-    color?: number;
-    fields?: [name: string, value: string][];
-    footer?: string;
-    timestamp?: string;
-    title?: string;
-  }) => {
-    return bot.helpers.sendMessage(CHANNELS.LOGS, {
-      embeds: [
-        {
-          color: options.color || 0x607d8b,
-          description: (Array.isArray(options.body)
-            ? options.body
-            : [options.body]
-          ).join('\n'),
-          fields: options.fields?.map(([name, value]) => ({
-            inline: true,
-            name,
-            value,
-          })),
-          timestamp: options.timestamp || new Date().toISOString(),
-          title: options.title,
-          ...(options.footer && { text: options.footer }),
-        },
-      ],
-    });
-  },
+  error: (title: string, message: string) =>
+    log({ body: `\`\`\`${message}\`\`\``, color: 0xf44336, title }),
+
+  log,
 
   post: (name: string, content: string) =>
     bot.helpers.createForumThread(CHANNELS.VIDEOS, {
