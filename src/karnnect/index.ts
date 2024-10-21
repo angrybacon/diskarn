@@ -22,13 +22,13 @@ const logger = Logger('KARNNECT');
  */
 export const karnnect = async () => {
   const total = Object.keys(CHANNELS).length;
+  if (process.env.SKIP_SUBSCRIPTION === '1') {
+    logger.log(`Dry-subscribed ${total} channels`, CHANNELS);
+    return;
+  }
   let index = 0;
   for (const [name, id] of Object.entries(CHANNELS)) {
     logger.log(`Subscribing ${++index}/${total} "${name}"...`);
-    if (process.env.SKIP_SUBSCRIPTION === '1') {
-      logger.log(`Subscribed "${name}" (fake)`);
-      continue;
-    }
     const lease = 10 * 24 * 60 * 60;
     const { ok, status, statusText } = await subscribe({ id, lease });
     if (!ok) throw new Error(`${status} ${statusText}`);

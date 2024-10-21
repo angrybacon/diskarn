@@ -1,9 +1,9 @@
 import Fastify from 'fastify';
 import { xml2js } from 'xml-js';
-import { z } from 'zod';
 
 import { Bot } from '../bot';
 import { Logger } from '../logger';
+import { zNotification } from './models';
 
 const logger = Logger('SERVER');
 
@@ -42,46 +42,12 @@ server.get('/challenge', {
   },
 });
 
-const zText = z.object({ _text: z.string() }).transform((it) => it._text);
-
-const zNotification = z.object({
-  feed: z.object({
-    entry: z
-      .object({
-        author: z.object({ name: zText }).transform((it) => it.name),
-        id: zText,
-        link: z
-          .object({ _attributes: z.object({ href: z.string() }) })
-          .transform((it) => it._attributes.href),
-        published: zText,
-        title: zText,
-        updated: zText,
-        'yt:channelId': zText,
-        'yt:videoId': zText,
-      })
-      .transform(
-        ({ 'yt:channelId': channelId, 'yt:videoId': videoId, ...it }) => ({
-          ...it,
-          channelId,
-          videoId,
-        }),
-      ),
-    title: zText,
-    updated: zText,
-  }),
-});
-
 server.post('/challenge', ({ body }) => {
   try {
-    logger.log('New notification (raw)', body);
-    const { feed } = zNotification.parse(body);
-    logger.log('New notification (parsed)', feed);
-    const { entry, title, updated } = feed;
-    Bot.log.success(
-      'New notification',
-      [updated, title],
-      Object.entries(entry),
-    );
+    const { entry, title } = zNotification.parse(body).feed;
+    logger.log(`New notification "${title}"`, entry);
+    const { channelId, videoId, ...rest } = entry;
+    Bot.log.success(`New notification "${title}"`, '', Object.entries(rest));
     Bot.post(entry.title, entry.link);
   } catch (error) {
     const message = error instanceof Error ? error.message : `${error}`;

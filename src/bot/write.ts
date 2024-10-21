@@ -28,11 +28,14 @@ export const embed = (
           ? options.body
           : [options.body]
         ).join('\n'),
-        fields: options.fields?.map(([name, value]) => ({
-          inline: true,
-          name,
-          value,
-        })),
+        fields: options.fields
+          ?.map(([name, value]) => ({
+            inline: value.length <= 20,
+            name,
+            value,
+          }))
+          .sort((a, b) => a.name.localeCompare(b.name))
+          .sort((a, b) => Number(a.inline) - Number(b.inline)),
         timestamp: options.timestamp || new Date().toISOString(),
         title: options.title,
         ...(options.footer && { text: options.footer }),

@@ -19,12 +19,12 @@ export const Bot = {
   log: {
     error: (
       title: string,
-      body?: string | [string, ...string[]],
+      body?: string,
       fields?: [name: string, value: string][],
     ) => embed(bot, 'LOGS', { body, color: 'DANGER', fields, title }),
     success: (
       title: string,
-      body?: string | [string, ...string[]],
+      body?: string,
       fields?: [name: string, value: string][],
     ) => embed(bot, 'LOGS', { body, color: 'SUCCESS', fields, title }),
   },
