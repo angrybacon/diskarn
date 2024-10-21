@@ -1,8 +1,8 @@
 import { scheduleJob } from 'node-schedule';
 
-import { Bot } from './bot';
-import { karnnect } from './karnnect';
-import { Server } from './server';
+import { Bot } from '~/bot';
+import { karnnect } from '~/karnnect';
+import { Server } from '~/server';
 
 (async () => {
   await Promise.all([Bot.start(), Server.start()]);

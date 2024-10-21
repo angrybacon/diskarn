@@ -3,6 +3,7 @@
     "declaration": false,
     "outDir": "dist",
     "module": "commonjs",
+    "paths": { "~/*": ["./src/*"] },
     "verbatimModuleSyntax": false
   },
   "exclude": ["node_modules"],

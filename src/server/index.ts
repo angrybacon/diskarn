@@ -2,7 +2,7 @@ import Fastify from 'fastify';
 import { xml2js } from 'xml-js';
 import { z } from 'zod';
 
-import { Bot } from './bot';
+import { Bot } from '~/bot';
 
 const server = Fastify();
 
