@@ -1,4 +1,5 @@
 import { Bot } from '~/bot';
+import { Logger } from '~/logger';
 
 const CHANNELS = {
   PirateSoftware: 'UCMnULQ6F6kLDAHxofDWIbrw',
@@ -12,6 +13,8 @@ const URLS = {
   TOPIC: 'https://www.youtube.com/xml/feeds/videos.xml?channel_id=',
 } as const;
 
+const logger = Logger('KARNNECT');
+
 /**
  * Subscribe to the WebSub notifications all of the channels in sequence.
  * Await in each iteration as a cheap way not to care about rate limits.
@@ -21,20 +24,17 @@ export const karnnect = async () => {
   const total = Object.keys(CHANNELS).length;
   let index = 0;
   for (const [name, id] of Object.entries(CHANNELS)) {
-    console.info(`[karnnect] Subscribing ${++index}/${total} "${name}"...`);
+    logger.log(`Subscribing ${++index}/${total} "${name}"...`);
     if (process.env.SKIP_SUBSCRIPTION === '1') {
-      console.info(`[karnnect] Subscribed "${name}" (fake)`);
+      logger.log(`Subscribed "${name}" (fake)`);
       continue;
     }
     const lease = 10 * 24 * 60 * 60;
     const { ok, status, statusText } = await subscribe({ id, lease });
     if (!ok) throw new Error(`${status} ${statusText}`);
-    console.info(`[karnnect] Subscribed "${name}"`);
+    logger.log(`Subscribed "${name}"`);
   }
-  Bot.log({
-    fields: Object.entries(CHANNELS).map(([name, id]) => [name, `\`${id}\``]),
-    title: `Subscribed ${total} WebSub notifications`,
-  });
+  Bot.log.success(`New subscriptions (${total})`, '', Object.entries(CHANNELS));
 };
 
 /** Subscribe or unsubscribe to a specific channel WebSub notifications */

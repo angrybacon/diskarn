@@ -1,80 +1,37 @@
 import { createBot } from '@discordeno/bot';
 
+import { embed, post } from '~/bot/write';
+import { Logger } from '~/logger';
+
 if (!process.env.TOKEN) {
   throw new Error('Could not find token');
 }
-
-// TODO Handle invalid IDs
-const CHANNELS = {
-  LOGS: '1294803194173456496',
-  VIDEOS: '1294371636094701670',
-} as const;
+const logger = Logger('BOT');
 
 const bot = createBot({
   events: {
-    ready() {
-      console.info('[bot] Bot is ready');
-      Bot.log({ title: 'Bot is ready' });
-    },
+    ready: (payload) => logger.log('Bot is ready', payload),
   },
   token: process.env.TOKEN,
 });
 
-const log = (options: {
-  body?: string | [string, ...string[]];
-  color?: number;
-  fields?: [name: string, value: string][];
-  footer?: string;
-  timestamp?: string;
-  title?: string;
-}) =>
-  bot.helpers.sendMessage(CHANNELS.LOGS, {
-    embeds: [
-      {
-        color: options.color || 0x607d8b,
-        description: (Array.isArray(options.body)
-          ? options.body
-          : [options.body]
-        ).join('\n'),
-        fields: options.fields?.map(([name, value]) => ({
-          inline: true,
-          name,
-          value,
-        })),
-        timestamp: options.timestamp || new Date().toISOString(),
-        title: options.title,
-        ...(options.footer && { text: options.footer }),
-      },
-    ],
-  });
-
-type Line = string | [text: string, options: { raw: string }];
-
 export const Bot = {
-  error: (title: string, message: string) =>
-    log({ body: `\`\`\`${message}\`\`\``, color: 0xf44336, title }),
+  log: {
+    error: (
+      title: string,
+      body?: string | [string, ...string[]],
+      fields?: [name: string, value: string][],
+    ) => embed(bot, 'LOGS', { body, color: 'DANGER', fields, title }),
+    success: (
+      title: string,
+      body?: string | [string, ...string[]],
+      fields?: [name: string, value: string][],
+    ) => embed(bot, 'LOGS', { body, color: 'SUCCESS', fields, title }),
+  },
 
-  log,
-
-  post: (name: string, content: string) =>
-    bot.helpers.createForumThread(CHANNELS.VIDEOS, {
-      autoArchiveDuration: 10080,
-      message: { content },
-      name,
-    }),
+  post: (name: string, content: string) => post(bot, 'VIDEOS', name, content),
 
   start: () => bot.start(),
 
   stop: () => bot.shutdown(),
-
-  write: (...lines: [Line, ...Line[]]) =>
-    bot.helpers.sendMessage(CHANNELS.LOGS, {
-      content: lines
-        .map((line) => {
-          if (typeof line === 'string') return line;
-          const [text, options] = line;
-          return `\`\`\`${options.raw}\n${text}\n\`\`\``;
-        })
-        .join('\n'),
-    }),
 } as const;

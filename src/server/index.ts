@@ -3,6 +3,9 @@ import { xml2js } from 'xml-js';
 import { z } from 'zod';
 
 import { Bot } from '~/bot';
+import { Logger } from '~/logger';
+
+const logger = Logger('SERVER');
 
 const server = Fastify();
 
@@ -20,14 +23,14 @@ server.addContentTypeParser(
 );
 
 server.addHook('onError', (_request, _reply, error) => {
-  console.error(`[server] An error occurred "${error.message}"`);
-  return Bot.error('An error occurred', error.message);
+  logger.error(`An error occurred "${error.message}"`);
+  return Bot.log.error('An error occurred', error.message);
 });
 
 server.get('/challenge', {
   handler: ({ query }) => {
     const challenge = (query as { 'hub.challenge': string })['hub.challenge'];
-    console.info(`[server] Verification challenge received "${challenge}"`);
+    logger.log(`Verification challenge received "${challenge}"`);
     return challenge;
   },
   schema: {
@@ -70,24 +73,20 @@ const zNotification = z.object({
 
 server.post('/challenge', ({ body }) => {
   try {
+    logger.log('New notification (raw)', body);
     const { feed } = zNotification.parse(body);
-    console.info(`[server] Received WebSub ${JSON.stringify(feed, null, 2)}`);
+    logger.log('New notification (parsed)', feed);
     const { entry, title, updated } = feed;
-    Bot.log({
-      body: [updated, title],
-      fields: Object.entries(entry).map(([key, value]) => [
-        `\`${key}\``,
-        `\`${value}\``,
-      ]),
-      title: 'Received WebSub notification',
-    });
+    Bot.log.success(
+      'New notification',
+      [updated, title],
+      Object.entries(entry),
+    );
     Bot.post(entry.title, entry.link);
   } catch (error) {
     const message = error instanceof Error ? error.message : `${error}`;
-    console.error(`[server] Could not read WebSub notification`);
-    console.error(message);
-    console.error(JSON.stringify(body, null, 2));
-    Bot.error('Could not read WebSub notification', message);
+    logger.error('Could not read notification', message, body);
+    Bot.log.error('Could not read notification', message);
   }
   return {};
 });
@@ -103,9 +102,9 @@ export const Server = {
         host: process.env.HOST,
         port: parseInt(process.env.PORT),
       });
-      server.log.info(`Server running on ${address}`);
+      logger.log(`Server running on ${address}`);
     } catch (error) {
-      server.log.error(error);
+      logger.error(`${error}`);
       process.exit(1);
     }
   },
