@@ -21,7 +21,7 @@ server.addContentTypeParser(
 
 server.addHook('onError', (_request, _reply, error) => {
   console.info(`[server] An error occured "${error.message}"`);
-  return Bot.log('# An error occured', [error.message, { raw: 'raw' }]);
+  return Bot.write('# An error occured', [error.message, { raw: 'raw' }]);
 });
 
 server.get('/challenge', {
@@ -73,23 +73,21 @@ server.post('/challenge', ({ body }) => {
     const { feed } = zNotification.parse(body);
     console.info(`[server] Received WebSub ${JSON.stringify(feed, null, 2)}`);
     const { entry, title, updated } = feed;
-    Bot.log(
-      '# Received WebSub',
-      `- Title: \`${title}\``,
-      `- Updated: \`${updated}\``,
-      [JSON.stringify(entry, null, 2), { raw: 'json' }],
-    );
+    Bot.log({
+      body: [updated, title],
+      fields: Object.entries(entry).map(([key, value]) => [
+        `\`${key}\``,
+        `\`${value}\``,
+      ]),
+      title: 'Received WebSub notification',
+    });
     Bot.post(entry.title, entry.link);
   } catch (error) {
     const message = error instanceof Error ? error.message : `${error}`;
     console.info(`[server] Could not read WebSub notification`);
     console.info(message);
     console.info(JSON.stringify(body, null, 2));
-    Bot.log(
-      '# Could not read WebSub notification',
-      [message, { raw: 'json' }],
-      [JSON.stringify(body, null, 2), { raw: 'json' }],
-    );
+    Bot.log({ body: message, title: 'Could not read WebSub notification' });
   }
   return {};
 });

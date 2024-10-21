@@ -31,10 +31,10 @@ export const karnnect = async () => {
     if (!ok) throw new Error(`${status} ${statusText}`);
     console.info(`[karnnect] Subscribed "${name}"`);
   }
-  Bot.log(
-    `# Subscribed ${total} WebSub notifications`,
-    ...Object.entries(CHANNELS).map(([name]) => `- \`${name}\``),
-  );
+  Bot.log({
+    fields: Object.entries(CHANNELS).map(([name, id]) => [name, `\`${id}\``]),
+    title: `Subscribed ${total} WebSub notifications`,
+  });
 };
 
 /** Subscribe or unsubscribe to a specific channel WebSub notifications */

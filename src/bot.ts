@@ -12,13 +12,9 @@ const CHANNELS = {
 
 const bot = createBot({
   events: {
-    ready({ applicationId, sessionId }) {
-      console.info(`[bot] Session is ready "${sessionId}"`);
-      Bot.log(
-        '# Session is ready',
-        `- Application: \`${applicationId}\``,
-        `- Session: \`${sessionId}\``,
-      );
+    ready() {
+      console.info('[bot] Bot is ready');
+      Bot.log({ title: 'Bot is ready' });
     },
   },
   token: process.env.TOKEN,
@@ -27,8 +23,47 @@ const bot = createBot({
 type Line = string | [text: string, options: { raw: string }];
 
 export const Bot = {
-  // TODO Probably want this to also the console by default
-  log: (...lines: [Line, ...Line[]]) =>
+  log: (options: {
+    body?: string | [string, ...string[]];
+    color?: number;
+    fields?: [name: string, value: string][];
+    footer?: string;
+    timestamp?: string;
+    title?: string;
+  }) => {
+    return bot.helpers.sendMessage(CHANNELS.LOGS, {
+      embeds: [
+        {
+          color: options.color || 0x607d8b,
+          description: (Array.isArray(options.body)
+            ? options.body
+            : [options.body]
+          ).join('\n'),
+          fields: options.fields?.map(([name, value]) => ({
+            inline: true,
+            name,
+            value,
+          })),
+          timestamp: options.timestamp || new Date().toISOString(),
+          title: options.title,
+          ...(options.footer && { text: options.footer }),
+        },
+      ],
+    });
+  },
+
+  post: (name: string, content: string) =>
+    bot.helpers.createForumThread(CHANNELS.VIDEOS, {
+      autoArchiveDuration: 10080,
+      message: { content },
+      name,
+    }),
+
+  start: () => bot.start(),
+
+  stop: () => bot.shutdown(),
+
+  write: (...lines: [Line, ...Line[]]) =>
     bot.helpers.sendMessage(CHANNELS.LOGS, {
       content: lines
         .map((line) => {
@@ -38,12 +73,4 @@ export const Bot = {
         })
         .join('\n'),
     }),
-  post: (name: string, content: string) =>
-    bot.helpers.createForumThread(CHANNELS.VIDEOS, {
-      autoArchiveDuration: 10080,
-      message: { content },
-      name,
-    }),
-  start: () => bot.start(),
-  stop: () => bot.shutdown(),
 } as const;
