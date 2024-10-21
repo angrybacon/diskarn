@@ -1,12 +1,11 @@
 {
   "compilerOptions": {
     "declaration": false,
-    "outDir": "dist",
+    "outDir": "./dist",
     "module": "commonjs",
-    "paths": { "~/*": ["./src/*"] },
     "verbatimModuleSyntax": false
   },
-  "exclude": ["node_modules"],
+  "exclude": ["./node_modules"],
   "extends": "./node_modules/@korumite/ts/tsconfig.nodom.json",
-  "include": ["src"]
+  "include": ["./src"]
 }

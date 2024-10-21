@@ -1,4 +1,4 @@
-import chalk, { ChalkInstance } from 'chalk';
+import chalk, { type Chalk } from 'chalk';
 
 const DOMAINS =
   // prettier-ignore
@@ -8,7 +8,7 @@ const DOMAINS =
     SERVER:   ['server',   chalk.yellow],
   } as const satisfies Record<
     Uppercase<string>,
-    [Lowercase<string>, ChalkInstance]
+    [Lowercase<string>, Chalk]
   >;
 
 const stringify = (input: unknown) =>

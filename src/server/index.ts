@@ -2,8 +2,8 @@ import Fastify from 'fastify';
 import { xml2js } from 'xml-js';
 import { z } from 'zod';
 
-import { Bot } from '~/bot';
-import { Logger } from '~/logger';
+import { Bot } from '../bot';
+import { Logger } from '../logger';
 
 const logger = Logger('SERVER');
 

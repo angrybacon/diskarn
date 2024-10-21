@@ -1,5 +1,5 @@
-import { Bot } from '~/bot';
-import { Logger } from '~/logger';
+import { Bot } from '../bot';
+import { Logger } from '../logger';
 
 const CHANNELS = {
   PirateSoftware: 'UCMnULQ6F6kLDAHxofDWIbrw',

@@ -1,6 +1,6 @@
 import { type Bot } from '@discordeno/bot';
 
-import { CHANNELS } from '~/bot/constants';
+import { CHANNELS } from './constants';
 
 const COLORS = {
   DANGER: 0xf44336,
