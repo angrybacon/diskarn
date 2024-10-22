@@ -1,3 +1,4 @@
+import { Writable } from 'stream';
 import chalk, { type Chalk } from 'chalk';
 
 const DOMAINS =
@@ -11,29 +12,37 @@ const DOMAINS =
     [Lowercase<string>, Chalk]
   >;
 
-const stringify = (input: unknown) =>
-  JSON.stringify(
-    input,
-    (_, value) => (typeof value === 'bigint' ? `${value}` : value),
-    2,
-  );
-
-const prettify = (inputs: unknown[], scope: keyof typeof DOMAINS) => {
+export const Logger = (scope: keyof typeof DOMAINS) => {
   const [domain, colorize] = DOMAINS[scope];
   const prefix = colorize(`[${domain}] `);
-  return inputs.map(
-    (input, index) =>
-      (index ? '' : prefix) +
-      (typeof input === 'string' ? input : stringify(input)).replaceAll(
-        '\n',
-        `\n${prefix}`,
-      ),
-  );
-};
 
-export const Logger = (scope: keyof typeof DOMAINS) => ({
-  error: (...inputs: [unknown, ...unknown[]]) =>
-    console.error(...prettify(inputs, scope)),
-  log: (...inputs: [unknown, ...unknown[]]) =>
-    console.info(...prettify(inputs, scope)),
-});
+  const write = (it: unknown) => {
+    let output = '';
+    // NOTE Spawn a new stream for each log because I'm worried that `output`
+    //      might be messed up with concurrent calls but too lazy to actually
+    //      check whether that's the case.
+    //      If memory becomes an issue (it won't), pull it out into `Logger`
+    //      directly.
+    const stream = new Writable({
+      write(chunk, _encoding, callback) {
+        output += chunk.toString();
+        callback();
+      },
+    });
+    const logger = new console.Console({ stdout: stream });
+    output = '';
+    logger.dir(it, { depth: null, colors: true });
+    console.debug(`${prefix}${output.trim().replaceAll('\n', `\n${prefix}`)}`);
+  };
+
+  return {
+    error: (message: string, ...extra: unknown[]) => {
+      console.error(`${prefix}${message}`);
+      extra.forEach(write);
+    },
+    log: (message: string, ...extra: unknown[]) => {
+      console.debug(`${prefix}${message}`);
+      extra.forEach(write);
+    },
+  };
+};

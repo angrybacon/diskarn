@@ -30,7 +30,7 @@ export const embed = (
         ).join('\n'),
         fields: options.fields
           ?.map(([name, value]) => ({
-            inline: value.length <= 20,
+            inline: value.length <= 30,
             name,
             value,
           }))
