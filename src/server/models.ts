@@ -5,9 +5,11 @@ const toDiscordTimestamp = (timestamp: string) =>
 
 const zDate = z
   .object({ _text: z.string().datetime({ offset: true }) })
-  .transform((it) => toDiscordTimestamp(it._text));
+  .transform((it) => toDiscordTimestamp(it._text.trim()));
 
-const zText = z.object({ _text: z.string() }).transform((it) => it._text);
+const zText = z
+  .object({ _text: z.string() })
+  .transform((it) => it._text.trim());
 
 export const zNotification = z.object({
   feed: z.object({

@@ -9,7 +9,7 @@ const COLORS = {
 } as const satisfies Record<string, number>;
 
 export const embed = (
-  bot: Bot,
+  { helpers }: Bot,
   channel: keyof typeof CHANNELS,
   options: {
     body?: string | [string, ...string[]];
@@ -20,7 +20,7 @@ export const embed = (
     title?: string;
   },
 ) =>
-  bot.helpers.sendMessage(CHANNELS[channel], {
+  helpers.sendMessage(CHANNELS[channel], {
     embeds: [
       {
         color: options.color ? COLORS[options.color] : COLORS.DEFAULT,
@@ -44,19 +44,19 @@ export const embed = (
   });
 
 export const post = (
-  bot: Bot,
+  { helpers }: Bot,
   channel: keyof typeof CHANNELS,
   name: string,
   content: string,
 ) =>
-  bot.helpers.createForumThread(CHANNELS[channel], {
+  helpers.createForumThread(CHANNELS[channel], {
     autoArchiveDuration: 10080,
     message: { content },
     name,
   });
 
 export const write = (
-  bot: Bot,
+  { helpers }: Bot,
   channel: keyof typeof CHANNELS,
   ...lines: [string, ...string[]]
-) => bot.helpers.sendMessage(CHANNELS[channel], { content: lines.join('\n') });
+) => helpers.sendMessage(CHANNELS[channel], { content: lines.join('\n') });

@@ -11,9 +11,17 @@ to provide said features for my own use. We're all consenting adults, read the
 licensing, read the source and adjust your expectations if you want to test it
 out yourself.
 
+#+BEGIN_QUOTE
 This was also supposed to be my [[https://deno.com/][Deno 2]] playground but it
 proved insufficiently stable at the time of the first commit. In their defense,
 the v2 was a couple hours old. Added to the evergrowing todo list.
+#+END_QUOTE
+
+I've chosen a name that doesn't directly reflect the features of the bot on
+purpose so that I can add or remove anything I want whenever I want. The list is
+currently pretty short.
+
+- YouTube notifications
 
 ** How Does It Work?
 
@@ -23,11 +31,23 @@ self-documented but here is a short breakdown if you're that lazy.
 - =bot= :: Handle the connection and interaction with the Discord server. This
   is using [[https://discordeno.js.org/][Discordeno]] to interact with the
   servers.
-- =karnnect= :: Connect (get it?) to YouTube /WebSub/ notifications. No polling
-  here, only renewable subscriptions.
-- =server= :: Handle the /WebSub/ notifications. YouTube's implementation of the
+- =karnnect= :: Connect (get it?) to YouTube notifications. No polling here,
+  only renewable /WebSub/ subscriptions. YouTube's implementation of the
   /WebSub/ standard is lacking and the expiring date is not reliable so the
-  servers asks for 10 days and renew the subscriptions every week.
+  servers asks for a 10 days lease and renew the subscriptions every week.
+- =server= :: Implement HTTP routes
+
+#+BEGIN_QUOTE
+*Disclaimer*: YouTube /WebSub/ notifications are triggered for all events and
+there's currently no way to filter out some events eg. if the channel author
+edits the video title, your callback endpoint /will/ receive a new notification.
+
+Since this project is small enough, a local =Set= in memory is probably enough
+to prevent /duplicate/ notifications. The counterpart is that it assumes the bot
+is deployed in a single instance for each of your servers (or a single instance
+for all your servers). If not, each instance will have their own =Set= and
+unicity will not be reliable.
+#+END_QUOTE
 
 ** Installation
 

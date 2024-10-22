@@ -42,13 +42,20 @@ server.get('/challenge', {
   },
 });
 
+const history = new Set<string>();
+
 server.post('/challenge', ({ body }) => {
   try {
     const { entry, title } = zNotification.parse(body).feed;
-    logger.log(`New notification "${title}"`, entry);
     const { channelId, videoId, ...rest } = entry;
-    Bot.log.success(`New notification "${title}"`, '', Object.entries(rest));
-    Bot.post(entry.title, entry.link);
+    const skip = history.has(videoId);
+    const message = `New notification "${title}"` + (skip ? ' (skipped)' : '');
+    logger.log(message, entry);
+    if (!skip) {
+      history.add(videoId);
+      Bot.post(entry.title, entry.link);
+    }
+    Bot.log.success(message, '', Object.entries(rest));
   } catch (error) {
     const message = error instanceof Error ? error.message : `${error}`;
     logger.error('Could not read notification', message, body);
