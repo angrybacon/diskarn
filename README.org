@@ -11,8 +11,40 @@ to provide said features for my own use. We're all consenting adults, read the
 licensing, read the source and adjust your expectations if you want to test it
 out yourself.
 
+This was also supposed to be my [[https://deno.com/][Deno 2]] playground but it
+proved insufficiently stable at the time of the first commit. In their defense,
+the v2 was a couple hours old. Added to the evergrowing todo list.
+
 ** How Does It Work?
 
-- =bot= :: Handle the connection and interaction with the Discord server
-- =karnnect= :: Subscribe to YouTube /WebSub/ notifications, no polling here
-- =server= :: Handle the /WebSub/ notifications
+The code is open source for a reason. The code should be obvious and
+self-documented but here is a short breakdown if you're that lazy.
+
+- =bot= :: Handle the connection and interaction with the Discord server. This
+  is using [[https://discordeno.js.org/][Discordeno]] to interact with the
+  servers.
+- =karnnect= :: Connect (get it?) to YouTube /WebSub/ notifications. No polling
+  here, only renewable subscriptions.
+- =server= :: Handle the /WebSub/ notifications. YouTube's implementation of the
+  /WebSub/ standard is lacking and the expiring date is not reliable so the
+  servers asks for 10 days and renew the subscriptions every week.
+
+** Installation
+
+I estimate the number of readers to be about 2 (/me/ and future /me/) so if the
+following steps don't work, it's probably your fault.
+
+1. Create a bot with an appropriate name at https://discord.com/developers
+1. Invite the bot to your server with your preferred method. A link from the
+   above platform usually, with the appropriate permissions
+1. Create a =.env.local= and configure it if you plan on testing the bot locally
+1. Configure the necessary environment variables
+
+** Variables
+
+- =CHANNELS= :: A JSON string containing the channels you should subscribe to
+- =HOST= :: Must be set to =0.0.0.0= if deployed online
+- =PORT= :: You can largely ignore this, but is provided as customization
+- =SKIP_SUBSCRIPTION= :: Skip the subscription events to avoid the noise
+- =TOKEN= :: Your bot token
+- =WEBSUB_CALLBACK_HOST= :: The host where /WebSub/ notifications should be sent

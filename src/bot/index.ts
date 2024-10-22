@@ -3,9 +3,8 @@ import { createBot } from '@discordeno/bot';
 import { embed, post } from '../bot/write';
 import { Logger } from '../logger';
 
-if (!process.env.TOKEN) {
-  throw new Error('Could not find token');
-}
+if (!process.env.TOKEN) throw new Error('Missing token');
+
 const logger = Logger('BOT');
 
 const bot = createBot({

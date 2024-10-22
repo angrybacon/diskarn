@@ -1,16 +1,14 @@
 import { Bot } from '../bot';
 import { Logger } from '../logger';
+import { zChannels } from './models';
 
-const CHANNELS = {
-  PirateSoftware: 'UCMnULQ6F6kLDAHxofDWIbrw',
-  t3dotgg: 'UCbRP3c757lWg9M-U7TyEkXA',
-} as const;
+if (!process.env.WEBSUB_CALLBACK_HOST) throw new Error('Missing callback host');
 
 const URLS = {
-  CALLBACK: 'https://diskarn.up.railway.app/challenge',
+  CALLBACK: `${process.env.WEBSUB_CALLBACK_HOST}/challenge`,
   DIAGNOSE: 'https://pubsubhubbub.appspot.com/subscription-details',
   SUBSCRIBE: 'https://pubsubhubbub.appspot.com',
-  TOPIC: 'https://www.youtube.com/xml/feeds/videos.xml?channel_id=',
+  TOPIC: 'https://www.youtube.com/xml/feeds/videos.xml',
 } as const;
 
 const logger = Logger('KARNNECT');
@@ -21,20 +19,22 @@ const logger = Logger('KARNNECT');
  * See <https://developers.google.com/youtube/v3/guides/push_notifications>.
  */
 export const karnnect = async () => {
-  const total = Object.keys(CHANNELS).length;
+  if (!process.env.CHANNELS) throw new Error('Missing channels');
+  const channels = zChannels.parse(JSON.parse(process.env.CHANNELS));
+  const total = Object.keys(channels).length;
   if (process.env.SKIP_SUBSCRIPTION === '1') {
-    logger.log(`Dry-subscribed ${total} channels`, CHANNELS);
+    logger.log(`Dry-subscribed ${total} channels`, channels);
     return;
   }
   let index = 0;
-  for (const [name, id] of Object.entries(CHANNELS)) {
+  for (const [name, id] of Object.entries(channels)) {
     logger.log(`Subscribing ${++index}/${total} "${name}"...`);
     const lease = 10 * 24 * 60 * 60;
     const { ok, status, statusText } = await subscribe({ id, lease });
     if (!ok) throw new Error(`${status} ${statusText}`);
     logger.log(`Subscribed "${name}"`);
   }
-  Bot.log.success(`New subscriptions (${total})`, '', Object.entries(CHANNELS));
+  Bot.log.success(`New subscriptions (${total})`, '', Object.entries(channels));
 };
 
 /** Subscribe or unsubscribe to a specific channel WebSub notifications */
@@ -56,7 +56,7 @@ const subscribe = (options: {
     body: new URLSearchParams({
       'hub.callback': URLS.CALLBACK,
       'hub.mode': options.undo ? 'unsubscribe' : 'subscribe',
-      'hub.topic': `${URLS.TOPIC}${options.id}`,
+      'hub.topic': `${URLS.TOPIC}?channel_id=${options.id}`,
       ...(options.lease && { ['hub.lease_seconds']: `${options.lease}` }),
       ...(options.secret && { ['hub.secret']: options.secret }),
       ...(options.token && { ['hub.verify_token']: options.token }),
@@ -80,7 +80,7 @@ const diagnose = (options: {
 }) => {
   const query = new URLSearchParams({
     'hub.callback': URLS.CALLBACK,
-    'hub.topic': `${URLS.TOPIC}${options.id}`,
+    'hub.topic': `${URLS.TOPIC}?channel_id=${options.id}`,
     ...(options.secret && { ['hub.secret']: options.secret }),
   });
   return fetch(`${URLS.DIAGNOSE}?${query.toString()}`);
