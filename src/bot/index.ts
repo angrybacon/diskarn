@@ -1,6 +1,6 @@
 import { createBot } from '@discordeno/bot';
 
-import { embed, post } from '../bot/write';
+import { embed, post, type EmbedOptions } from '../bot/write';
 import { Logger } from '../logger';
 
 if (!process.env.TOKEN) throw new Error('Missing token');
@@ -17,15 +17,17 @@ const bot = createBot({
 export const Bot = {
   log: {
     error: (
-      title: string,
-      body?: string,
-      fields?: [name: string, value: string][],
-    ) => embed(bot, 'LOGS', { body, color: 'DANGER', fields, title }),
+      title: EmbedOptions['title'],
+      body: EmbedOptions['body'],
+      options?: Omit<EmbedOptions, 'body' | 'title'>,
+    ) => embed(bot, 'LOGS', { body, color: 'DANGER', title, ...options }),
     success: (
-      title: string,
-      body?: string,
-      fields?: [name: string, value: string][],
-    ) => embed(bot, 'LOGS', { body, color: 'SUCCESS', fields, title }),
+      title: EmbedOptions['title'],
+      body?: EmbedOptions['body'],
+      fields?: EmbedOptions['fields'],
+      options?: Omit<EmbedOptions, 'body' | 'fields' | 'title'>,
+    ) =>
+      embed(bot, 'LOGS', { body, color: 'SUCCESS', fields, title, ...options }),
   },
 
   post: (name: string, content: string) => post(bot, 'VIDEOS', name, content),

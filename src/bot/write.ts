@@ -8,17 +8,19 @@ const COLORS = {
   SUCCESS: 0x00bcd4,
 } as const satisfies Record<string, number>;
 
+export type EmbedOptions = {
+  body?: string | [string, ...string[]];
+  color?: keyof typeof COLORS;
+  fields?: [name: string, value: string][];
+  footer?: string;
+  timestamp?: string;
+  title?: string;
+};
+
 export const embed = (
   { helpers }: Bot,
   channel: keyof typeof CHANNELS,
-  options: {
-    body?: string | [string, ...string[]];
-    color?: keyof typeof COLORS;
-    fields?: [name: string, value: string][];
-    footer?: string;
-    timestamp?: string;
-    title?: string;
-  },
+  options: EmbedOptions,
 ) =>
   helpers.sendMessage(CHANNELS[channel], {
     embeds: [
