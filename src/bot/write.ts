@@ -50,7 +50,7 @@ export const embed = (
           .sort((a, b) => Number(a.inline) - Number(b.inline)),
         timestamp: options.timestamp || new Date().toISOString(),
         title: options.title,
-        ...(options.footer && { text: options.footer }),
+        ...(options.footer && { footer: { text: options.footer } }),
       },
     ],
   });

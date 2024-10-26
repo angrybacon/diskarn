@@ -26,11 +26,11 @@ currently pretty short.
 ** How Does It Work?
 
 The code is open source for a reason. The code should be obvious and
-self-documented but here is a short breakdown if you're that lazy.
+self-documenting but here is a short breakdown if you're that lazy.
 
 - =bot= :: Handle the connection and interaction with the Discord server. This
   is using [[https://discordeno.js.org/][Discordeno]] to interact with the
-  servers.
+  Discord guilds.
 - =karnnect= :: Connect (get it?) to YouTube notifications. No polling here,
   only renewable /WebSub/ subscriptions. YouTube's implementation of the
   /WebSub/ standard is lacking and the expiring date is not reliable so the
@@ -40,13 +40,13 @@ self-documented but here is a short breakdown if you're that lazy.
 #+BEGIN_QUOTE
 *Disclaimer*: YouTube /WebSub/ notifications are triggered for all events and
 there's currently no way to filter out some events eg. if the channel author
-edits the video title, your callback endpoint /will/ receive a new notification.
+edits the video title, your callback endpoint will receive a new notification.
 
 Since this project is small enough, a local =Set= in memory is probably enough
 to prevent /duplicate/ notifications. The counterpart is that it assumes the bot
 is deployed in a single instance for each of your servers (or a single instance
 for all your servers). If not, each instance will have their own =Set= and
-unicity will not be reliable.
+uniqueness will not be reliable.
 #+END_QUOTE
 
 ** Installation
@@ -62,8 +62,8 @@ following steps don't work, it's probably your fault.
 
 ** Variables
 
-- =HOST= :: Must be set to =0.0.0.0= if deployed online
-- =PORT= :: You can largely ignore this, but is provided as customization
-- =SKIP_SUBSCRIPTION= :: Skip the subscription events to avoid the noise
+- =HOST= :: Must be set to =0.0.0.0= when online
+- =PORT= :: You can largely ignore this, but is provided for customization
+- =SKIP_SUBSCRIPTION= :: Skip the subscription events to prevent the noise
 - =TOKEN= :: Your bot token
-- =WEBSUB_CALLBACK_HOST= :: The host where /WebSub/ notifications should be sent
+- =WEBSUB_CALLBACK_DOMAIN= :: Where the server will be hosted

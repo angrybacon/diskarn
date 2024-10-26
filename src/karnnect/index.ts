@@ -3,10 +3,11 @@ import { Logger } from '../logger';
 import { SUBSCRIPTIONS } from './constants';
 import { zSubscriptions } from './models';
 
-if (!process.env.WEBSUB_CALLBACK_HOST) throw new Error('Missing callback host');
+if (!process.env.WEBSUB_CALLBACK_DOMAIN)
+  throw new Error('Missing callback domain');
 
 const URLS = {
-  CALLBACK: `${process.env.WEBSUB_CALLBACK_HOST}/challenge`,
+  CALLBACK: `${process.env.WEBSUB_CALLBACK_DOMAIN}/challenge`,
   DIAGNOSE: 'https://pubsubhubbub.appspot.com/subscription-details',
   SUBSCRIBE: 'https://pubsubhubbub.appspot.com',
   TOPIC: 'https://www.youtube.com/xml/feeds/videos.xml',
