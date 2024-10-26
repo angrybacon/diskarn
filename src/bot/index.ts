@@ -16,18 +16,45 @@ const bot = createBot({
 
 export const Bot = {
   log: {
-    error: (title: EmbedOptions['title'], body: EmbedOptions['body']) =>
-      embed(bot, 'LOGS', { body, code: true, color: 'DANGER', title }),
-    success: (
+    error: async (title: EmbedOptions['title'], body: EmbedOptions['body']) => {
+      try {
+        return await embed(bot, 'LOGS', {
+          body,
+          code: true,
+          color: 'DANGER',
+          title,
+        });
+      } catch (error) {
+        logger.error(error);
+      }
+    },
+    success: async (
       title: EmbedOptions['title'],
       body?: EmbedOptions['body'],
       fields?: EmbedOptions['fields'],
       options?: Omit<EmbedOptions, 'body' | 'fields' | 'title'>,
-    ) =>
-      embed(bot, 'LOGS', { body, color: 'SUCCESS', fields, title, ...options }),
+    ) => {
+      try {
+        return await embed(bot, 'LOGS', {
+          body,
+          color: 'SUCCESS',
+          fields,
+          title,
+          ...options,
+        });
+      } catch (error) {
+        logger.error(error);
+      }
+    },
   },
 
-  post: (name: string, content: string) => post(bot, 'VIDEOS', name, content),
+  post: async (name: string, content: string) => {
+    try {
+      return await post(bot, 'VIDEOS', name, content);
+    } catch (error) {
+      logger.error(error);
+    }
+  },
 
   start: () => bot.start(),
 

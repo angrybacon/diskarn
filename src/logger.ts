@@ -30,18 +30,20 @@ export const Logger = (scope: keyof typeof DOMAINS) => {
       },
     });
     const logger = new console.Console({ stdout: stream });
-    logger.dir(it, { depth: null, colors: true });
+    output = '';
+    if (it instanceof Error) {
+      logger.dir(it.message, { depth: null, colors: true });
+      logger.dir(it.cause, { depth: null, colors: true });
+    } else {
+      logger.dir(it, { depth: null, colors: true });
+    }
     console[level](`${prefix}${output.trim().replaceAll('\n', `\n${prefix}`)}`);
   };
 
   return {
-    error: (message: string, ...extra: unknown[]) => {
-      console.error(`${prefix}${message}`);
-      extra.forEach((it) => write(it, 'error'));
-    },
-    log: (message: string, ...extra: unknown[]) => {
-      console.debug(`${prefix}${message}`);
-      extra.forEach((it) => write(it, 'debug'));
-    },
+    error: (...messages: unknown[]) =>
+      messages.forEach((it) => write(it, 'error')),
+    log: (...messages: unknown[]) =>
+      messages.forEach((it) => write(it, 'debug')),
   };
 };
