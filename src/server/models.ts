@@ -7,6 +7,10 @@ const zDate = z
   .object({ _text: z.string().datetime({ offset: true }) })
   .transform((it) => toDiscordTimestamp(it._text.trim()));
 
+const zLink = z
+  .object({ _attributes: z.object({ href: z.string() }) })
+  .transform((it) => it._attributes.href);
+
 const zText = z
   .object({ _text: z.string() })
   .transform((it) => it._text.trim());
@@ -16,9 +20,16 @@ export const zNotification = z.object({
     entry: z
       .object({
         author: z.object({ name: zText }).transform((it) => it.name),
-        link: z
-          .object({ _attributes: z.object({ href: z.string() }) })
-          .transform((it) => it._attributes.href),
+        link: z.union([
+          zLink,
+          // NOTE Sometimes the notification contains localized links, let's
+          //      test it out and see whether returning the first one always is
+          //      good enough.
+          zLink
+            .array()
+            .nonempty()
+            .transform(([it]) => it),
+        ]),
         published: zDate,
         title: zText,
         updated: zDate,

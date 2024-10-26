@@ -16,7 +16,7 @@ export const Logger = (scope: keyof typeof DOMAINS) => {
   const [domain, colorize] = DOMAINS[scope];
   const prefix = colorize(`[${domain}] `);
 
-  const write = (it: unknown) => {
+  const write = (it: unknown, level: 'debug' | 'error') => {
     let output = '';
     // NOTE Spawn a new stream for each log because I'm worried that `output`
     //      might be messed up with concurrent calls but too lazy to actually
@@ -30,19 +30,18 @@ export const Logger = (scope: keyof typeof DOMAINS) => {
       },
     });
     const logger = new console.Console({ stdout: stream });
-    output = '';
     logger.dir(it, { depth: null, colors: true });
-    console.debug(`${prefix}${output.trim().replaceAll('\n', `\n${prefix}`)}`);
+    console[level](`${prefix}${output.trim().replaceAll('\n', `\n${prefix}`)}`);
   };
 
   return {
     error: (message: string, ...extra: unknown[]) => {
       console.error(`${prefix}${message}`);
-      extra.forEach(write);
+      extra.forEach((it) => write(it, 'error'));
     },
     log: (message: string, ...extra: unknown[]) => {
       console.debug(`${prefix}${message}`);
-      extra.forEach(write);
+      extra.forEach((it) => write(it, 'debug'));
     },
   };
 };
