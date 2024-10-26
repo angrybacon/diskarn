@@ -62,7 +62,6 @@ following steps don't work, it's probably your fault.
 
 ** Variables
 
-- =CHANNELS= :: A JSON string containing the channels you should subscribe to
 - =HOST= :: Must be set to =0.0.0.0= if deployed online
 - =PORT= :: You can largely ignore this, but is provided as customization
 - =SKIP_SUBSCRIPTION= :: Skip the subscription events to avoid the noise

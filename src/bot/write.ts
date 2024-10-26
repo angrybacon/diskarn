@@ -8,13 +8,23 @@ const COLORS = {
   SUCCESS: 0x00bcd4,
 } as const satisfies Record<string, number>;
 
+const FORMATTERS = {
+  code: (input: string, language?: 'json') =>
+    [`\`\`\`${language || ''}`, input, '```'].join('\n'),
+  list: (...inputs: [string, ...string[]]) =>
+    inputs.map((input) => `- ${input}`).join('\n'),
+  verbatim: (input: string) => `\`${input}\``,
+} as const;
+
 export type EmbedOptions = {
-  body?: string | [string, ...string[]];
+  body?: string;
+  /** Whether the body should be rendered with a code block. */
+  code?: true;
   color?: keyof typeof COLORS;
   fields?: [name: string, value: string][];
   footer?: string;
   timestamp?: string;
-  title?: string;
+  title: string;
 };
 
 export const embed = (
@@ -26,10 +36,10 @@ export const embed = (
     embeds: [
       {
         color: options.color ? COLORS[options.color] : COLORS.DEFAULT,
-        description: (Array.isArray(options.body)
-          ? options.body
-          : [options.body]
-        ).join('\n'),
+        description:
+          options.body && options.code
+            ? FORMATTERS.code(options.body)
+            : options.body,
         fields: options.fields
           ?.map(([name, value]) => ({
             inline: value.length <= 30,

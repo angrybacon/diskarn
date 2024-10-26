@@ -16,11 +16,8 @@ const bot = createBot({
 
 export const Bot = {
   log: {
-    error: (
-      title: EmbedOptions['title'],
-      body: EmbedOptions['body'],
-      options?: Omit<EmbedOptions, 'body' | 'title'>,
-    ) => embed(bot, 'LOGS', { body, color: 'DANGER', title, ...options }),
+    error: (title: EmbedOptions['title'], body: EmbedOptions['body']) =>
+      embed(bot, 'LOGS', { body, code: true, color: 'DANGER', title }),
     success: (
       title: EmbedOptions['title'],
       body?: EmbedOptions['body'],
