@@ -1,7 +1,7 @@
 import { Bot } from '../bot';
 import { Logger } from '../logger';
 import { SUBSCRIPTIONS } from './constants';
-import { zChannels } from './models';
+import { zSubscriptions } from './models';
 
 if (!process.env.WEBSUB_CALLBACK_HOST) throw new Error('Missing callback host');
 
@@ -20,21 +20,26 @@ const logger = Logger('KARNNECT');
  * See <https://developers.google.com/youtube/v3/guides/push_notifications>.
  */
 export const karnnect = async () => {
-  const channels = zChannels.parse(SUBSCRIPTIONS);
-  const total = Object.keys(channels).length;
+  const subscriptions = zSubscriptions.parse(SUBSCRIPTIONS);
+  const total = Object.keys(subscriptions).length;
   if (process.env.SKIP_SUBSCRIPTION === '1') {
-    logger.log(`Dry-configured ${total} channels`, channels);
+    logger.log(`Dry-configured ${total} subscriptions`, subscriptions);
     return;
   }
   let index = 0;
-  for (const [name, id] of Object.entries(channels)) {
+  for (const [name, id] of Object.entries(subscriptions)) {
     logger.log(`Subscribing ${++index}/${total} "${name}"...`);
     const lease = 10 * 24 * 60 * 60;
     const { ok, status, statusText } = await subscribe({ id, lease });
     if (!ok) throw new Error(`${status} ${statusText}`);
     logger.log(`Subscribed "${name}"`);
   }
-  Bot.log.success(`Configured ${total} channels`, '', Object.entries(channels));
+  Bot.log.success(
+    `Configured ${total} subscriptions`,
+    '',
+    Object.entries(subscriptions),
+  );
+  Bot.status(`Watching ${total} YouTube channels`);
 };
 
 /** Subscribe or unsubscribe to a specific channel WebSub notifications */

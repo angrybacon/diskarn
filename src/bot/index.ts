@@ -1,4 +1,4 @@
-import { createBot } from '@discordeno/bot';
+import { ActivityTypes, createBot } from '@discordeno/bot';
 
 import { embed, post, type EmbedOptions } from '../bot/write';
 import { Logger } from '../logger';
@@ -30,6 +30,14 @@ export const Bot = {
   post: (name: string, content: string) => post(bot, 'VIDEOS', name, content),
 
   start: () => bot.start(),
+
+  status: async (state: string) => {
+    await bot.gateway.editBotStatus({
+      activities: [{ name: 'Ready', state, type: ActivityTypes.Custom }],
+      status: 'online',
+    });
+    logger.log(`New status "${state}"`);
+  },
 
   stop: () => bot.shutdown(),
 } as const;
