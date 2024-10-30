@@ -1,7 +1,6 @@
 import Fastify from 'fastify';
 import { xml2js } from 'xml-js';
 
-import { Bot } from '../bot/bot';
 import { process as processNotification } from '../karnnect/notification';
 import { logger } from './logger';
 
@@ -20,10 +19,9 @@ server.addContentTypeParser(
   },
 );
 
-server.addHook('onError', (_request, _reply, error) => {
-  logger.error(`An error occurred "${error.message}"`);
-  return Bot.log.error('An error occurred', error.message);
-});
+server.addHook('onError', (_request, _reply, error) =>
+  logger.error(`An error occurred "${error.message}"`),
+);
 
 server.get('/challenge', {
   handler: ({ query }) => {
@@ -45,7 +43,11 @@ server.post('/challenge', ({ body }) => {
   return {};
 });
 
-server.get('/hello', () => 'Which Karn?');
+server.get('/hello', () => {
+  const message = 'Which Karn?';
+  logger.log(message);
+  return message;
+});
 
 export const Server = {
   start: async () => {

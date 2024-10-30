@@ -29,10 +29,10 @@ export type EmbedOptions = {
 
 export const embed = (
   { helpers }: Bot,
-  channel: keyof typeof CHANNELS,
+  channel: string,
   options: EmbedOptions,
 ) =>
-  helpers.sendMessage(CHANNELS[channel], {
+  helpers.sendMessage(channel, {
     embeds: [
       {
         color: options.color ? COLORS[options.color] : COLORS.MUTED,
@@ -57,18 +57,12 @@ export const embed = (
 
 export const post = (
   { helpers }: Bot,
-  channel: keyof typeof CHANNELS,
+  channel: string,
   name: string,
   content: string,
 ) =>
-  helpers.createForumThread(CHANNELS[channel], {
+  helpers.createForumThread(channel, {
     autoArchiveDuration: 10080,
     message: { content },
     name,
   });
-
-export const write = (
-  { helpers }: Bot,
-  channel: keyof typeof CHANNELS,
-  ...lines: [string, ...string[]]
-) => helpers.sendMessage(CHANNELS[channel], { content: lines.join('\n') });

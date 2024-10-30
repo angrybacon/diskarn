@@ -1,6 +1,7 @@
 import { ActivityTypes, createBot } from '@discordeno/bot';
 
 import { embed, post, type EmbedOptions } from '../bot/write';
+import { SERVERS } from './configuration';
 import { logger } from './logger';
 
 if (!process.env.TOKEN) throw new Error('Missing token');
@@ -13,10 +14,10 @@ const bot = createBot({
 });
 
 export const Bot = {
-  log: {
+  log: (server: keyof typeof SERVERS) => ({
     error: async (title: EmbedOptions['title'], body: EmbedOptions['body']) => {
       try {
-        return await embed(bot, 'LOGS', {
+        return await embed(bot, SERVERS[server].logs, {
           body,
           code: true,
           color: 'DANGER',
@@ -33,7 +34,7 @@ export const Bot = {
       options?: Omit<EmbedOptions, 'body' | 'fields' | 'title'>,
     ) => {
       try {
-        return await embed(bot, 'LOGS', {
+        return await embed(bot, SERVERS[server].logs, {
           body,
           color: 'SUCCESS',
           fields,
@@ -44,11 +45,11 @@ export const Bot = {
         logger.error(error);
       }
     },
-  },
+  }),
 
-  post: async (name: string, content: string) => {
+  post: async (server: keyof typeof SERVERS, name: string, content: string) => {
     try {
-      return await post(bot, 'VIDEOS', name, content);
+      return await post(bot, SERVERS[server].videos, name, content);
     } catch (error) {
       logger.error(error);
     }

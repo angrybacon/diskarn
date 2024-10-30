@@ -1,4 +1,5 @@
 import { Bot } from '../bot/bot';
+import { SERVERS } from '../bot/configuration';
 import { SUBSCRIPTIONS } from './configuration';
 import { logger } from './logger';
 import { zSubscriptions } from './models';
@@ -20,25 +21,26 @@ const URLS = {
  */
 export const karnnect = async () => {
   const subscriptions = zSubscriptions.parse(SUBSCRIPTIONS);
-  const total = Object.keys(subscriptions).length;
   if (process.env.SKIP_SUBSCRIPTION === '1') {
-    logger.log(`Dry-configured ${total} subscriptions`, subscriptions);
+    logger.log(`Dry-configured new subscriptions`, subscriptions);
     return;
   }
-  let index = 0;
   for (const [name, id] of Object.entries(subscriptions)) {
-    logger.log(`Subscribing ${++index}/${total} "${name}"...`);
     const lease = 10 * 24 * 60 * 60;
     const { ok, status, statusText } = await subscribe({ id, lease });
     if (!ok) throw new Error(`${status} ${statusText}`);
     logger.log(`Subscribed "${name}"`);
   }
-  Bot.log.success(
-    `Configured ${total} subscriptions`,
-    '',
-    Object.entries(subscriptions),
-  );
-  Bot.status(`Watching ${total} YouTube channels`);
+  return Promise.all([
+    ...Object.keys(SERVERS).map((server) =>
+      Bot.log(server as keyof typeof SERVERS).success(
+        'Configured new subscriptions',
+        '',
+        Object.entries(subscriptions),
+      ),
+    ),
+    Bot.status(`Watching ${Object.keys(subscriptions).length} subscriptions`),
+  ]);
 };
 
 /** Subscribe or unsubscribe to a specific channel WebSub notifications */
