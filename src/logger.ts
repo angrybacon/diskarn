@@ -32,8 +32,10 @@ export const Logger = (scope: keyof typeof DOMAINS) => {
     const logger = new console.Console({ stdout: stream });
     output = '';
     if (it instanceof Error) {
-      logger.dir(it.message, { depth: null, colors: true });
+      logger.log(it.message);
       logger.dir(it.cause, { depth: null, colors: true });
+    } else if (typeof it === 'string') {
+      logger.log(it);
     } else {
       logger.dir(it, { depth: null, colors: true });
     }

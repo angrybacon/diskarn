@@ -36,6 +36,7 @@ export const zNotification = z.object({
         'yt:channelId': zText,
         'yt:videoId': zText,
       })
+      .catchall(zText)
       .transform(
         ({ 'yt:channelId': channelId, 'yt:videoId': videoId, ...it }) => ({
           ...it,
