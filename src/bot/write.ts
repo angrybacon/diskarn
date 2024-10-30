@@ -4,7 +4,7 @@ import { CHANNELS } from './constants';
 
 const COLORS = {
   DANGER: 0xf44336,
-  DEFAULT: 0x607d8b,
+  MUTED: 0x607d8b,
   SUCCESS: 0x00bcd4,
 } as const satisfies Record<string, number>;
 
@@ -35,7 +35,7 @@ export const embed = (
   helpers.sendMessage(CHANNELS[channel], {
     embeds: [
       {
-        color: options.color ? COLORS[options.color] : COLORS.DEFAULT,
+        color: options.color ? COLORS[options.color] : COLORS.MUTED,
         description:
           options.body && options.code
             ? FORMATTERS.code(options.body)

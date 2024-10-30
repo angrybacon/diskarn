@@ -3,7 +3,7 @@ import { xml2js } from 'xml-js';
 
 import { Bot } from '../bot';
 import { Logger } from '../logger';
-import { zNotification } from './models';
+import { zNotification, type Notification } from './models';
 
 const logger = Logger('SERVER');
 
@@ -44,18 +44,29 @@ server.get('/challenge', {
 
 const history = new Set<string>();
 
+const validate = ({ videoId }: Notification) => {
+  if (history.has(videoId)) {
+    return { skip: true, reason: 'duplicate' } as const;
+  }
+  // TODO Add instance-specific title filters
+  return { skip: false } as const;
+};
+
 server.post('/challenge', ({ body }) => {
   try {
-    const { entry, title } = zNotification.parse(body).feed;
-    const { channelId, link, ...rest } = entry;
-    const skip = history.has(entry.videoId);
-    const message = `New notification` + (skip ? ' (skipped)' : '');
+    const entry = zNotification.parse(body);
+    const { channelId, link, title, videoId, ...rest } = entry;
+    const { reason, skip } = validate(entry);
+    const message = `New notification` + (reason ? ` (${reason})` : '');
     logger.log(message, entry);
     if (!skip) {
       history.add(entry.videoId);
       Bot.post(entry.title, entry.link);
     }
-    Bot.log.success(message, '', Object.entries(rest), { footer: title });
+    Bot.log.success(message, title, Object.entries(rest), {
+      footer: videoId,
+      ...(skip && { color: 'MUTED' }),
+    });
   } catch (error) {
     const message = error instanceof Error ? error.message : `${error}`;
     logger.error('Could not read notification', message, body);

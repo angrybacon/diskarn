@@ -15,35 +15,38 @@ const zText = z
   .object({ _text: z.string() })
   .transform((it) => it._text.trim());
 
-export const zNotification = z.object({
-  feed: z.object({
-    entry: z
-      .object({
-        author: z.object({ name: zText }).transform((it) => it.name),
-        link: z.union([
-          zLink,
-          // NOTE Sometimes the notification contains localized links, let's
-          //      test it out and see whether returning the first one always is
-          //      good enough.
-          zLink
-            .array()
-            .nonempty()
-            .transform(([it]) => it),
-        ]),
-        published: zDate,
-        title: zText,
-        updated: zDate,
-        'yt:channelId': zText,
-        'yt:videoId': zText,
-      })
-      .catchall(zText)
-      .transform(
-        ({ 'yt:channelId': channelId, 'yt:videoId': videoId, ...it }) => ({
-          ...it,
-          channelId,
-          videoId,
-        }),
-      ),
-    title: zText,
-  }),
-});
+export const zNotification = z
+  .object({
+    feed: z.object({
+      entry: z
+        .object({
+          author: z.object({ name: zText }).transform((it) => it.name),
+          link: z.union([
+            zLink,
+            // NOTE Sometimes the notification contains localized links, let's
+            //      test it out and see whether returning the first one always
+            //      is good enough.
+            zLink
+              .array()
+              .nonempty()
+              .transform(([it]) => it),
+          ]),
+          published: zDate,
+          title: zText,
+          updated: zDate,
+          'yt:channelId': zText,
+          'yt:videoId': zText,
+        })
+        .catchall(zText)
+        .transform(
+          ({ 'yt:channelId': channelId, 'yt:videoId': videoId, ...it }) => ({
+            ...it,
+            channelId,
+            videoId,
+          }),
+        ),
+    }),
+  })
+  .transform((it) => it.feed.entry);
+
+export type Notification = z.infer<typeof zNotification>;
