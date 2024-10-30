@@ -1,6 +1,6 @@
-import { Bot } from '../bot';
+import { Bot } from '../bot/bot';
 import { Logger } from '../logger';
-import { SUBSCRIPTIONS } from './constants';
+import { SUBSCRIPTIONS } from './configuration';
 import { zSubscriptions } from './models';
 
 if (!process.env.WEBSUB_CALLBACK_DOMAIN)

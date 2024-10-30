@@ -1,7 +1,7 @@
 import Fastify from 'fastify';
 import { xml2js } from 'xml-js';
 
-import { Bot } from '../bot';
+import { Bot } from '../bot/bot';
 import { Logger } from '../logger';
 import { zNotification, type Notification } from './models';
 
