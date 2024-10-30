@@ -1,6 +1,6 @@
 import { Bot } from '../bot/bot';
-import { Logger } from '../logger';
 import { SUBSCRIPTIONS } from './configuration';
+import { logger } from './logger';
 import { zSubscriptions } from './models';
 
 if (!process.env.WEBSUB_CALLBACK_DOMAIN)
@@ -12,8 +12,6 @@ const URLS = {
   SUBSCRIBE: 'https://pubsubhubbub.appspot.com',
   TOPIC: 'https://www.youtube.com/xml/feeds/videos.xml',
 } as const;
-
-const logger = Logger('KARNNECT');
 
 /**
  * Subscribe to the WebSub notifications all of the channels in sequence.

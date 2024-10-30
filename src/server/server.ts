@@ -2,10 +2,8 @@ import Fastify from 'fastify';
 import { xml2js } from 'xml-js';
 
 import { Bot } from '../bot/bot';
-import { Logger } from '../logger';
-import { zNotification, type Notification } from './models';
-
-const logger = Logger('SERVER');
+import { process as processNotification } from '../karnnect/notification';
+import { logger } from './logger';
 
 const server = Fastify();
 
@@ -42,36 +40,8 @@ server.get('/challenge', {
   },
 });
 
-const history = new Set<string>();
-
-const validate = ({ videoId }: Notification) => {
-  if (history.has(videoId)) {
-    return { skip: true, reason: 'duplicate' } as const;
-  }
-  // TODO Add instance-specific title filters
-  return { skip: false } as const;
-};
-
 server.post('/challenge', ({ body }) => {
-  try {
-    const entry = zNotification.parse(body);
-    const { channelId, link, title, videoId, ...rest } = entry;
-    const { reason, skip } = validate(entry);
-    const message = `New notification` + (reason ? ` (${reason})` : '');
-    logger.log(message, entry);
-    if (!skip) {
-      history.add(entry.videoId);
-      Bot.post(entry.title, entry.link);
-    }
-    Bot.log.success(message, title, Object.entries(rest), {
-      footer: videoId,
-      ...(skip && { color: 'MUTED' }),
-    });
-  } catch (error) {
-    const message = error instanceof Error ? error.message : `${error}`;
-    logger.error('Could not read notification', message, body);
-    Bot.log.error('Could not read notification', message);
-  }
+  processNotification(body);
   return {};
 });
 
