@@ -40,10 +40,12 @@ export const process = (response: unknown) => {
       history[server].add(entry.videoId);
       Bot.post(server, entry.title, entry.link);
     }
-    Bot.log(server).success(message, title, Object.entries(rest), {
-      footer: `[${id}](${link})`,
-      ...(skip && { color: 'MUTED' }),
-    });
+    Bot.log(server).success(
+      message,
+      `[${title}](${link})`,
+      Object.entries(rest),
+      { footer: id, ...(skip && { color: 'MUTED' }) },
+    );
   } catch (error) {
     const message = error instanceof Error ? error.message : `${error}`;
     logger.error(`[${server}] Could not read notification`, message, response);

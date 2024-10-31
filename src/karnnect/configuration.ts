@@ -27,9 +27,7 @@ export const CONFIGURATION: {
     filter: /[\w-]day|ddft|tainted/i,
     server: 'DOOMSDAY',
     subscriptions: [
-      SUBSCRIPTIONS.BOSH_N_ROLL,
       SUBSCRIPTIONS.JAMES_KISAU,
-      SUBSCRIPTIONS.JUDGING_FTW,
       SUBSCRIPTIONS.NEVILSHUTE,
       SUBSCRIPTIONS.REVENANTKIOKU,
       SUBSCRIPTIONS.SAWATARIX,
@@ -37,7 +35,6 @@ export const CONFIGURATION: {
   },
   {
     channels: { logs: '1294803194173456496', videos: '1294371636094701670' },
-    filter: /next|react/i,
     server: 'KORUMITE',
     subscriptions: Object.values(SUBSCRIPTIONS),
   },
