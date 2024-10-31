@@ -27,7 +27,7 @@ export const process = (response: unknown) => {
   let server: keyof typeof SERVERS | undefined = undefined;
   try {
     const entry = zNotification.parse(response);
-    const { channelId, link, title, videoId, ...rest } = entry;
+    const { channelId, id, link, title, videoId, ...rest } = entry;
     const configuration = Object.values(CONFIGURATION).find((it) =>
       it.subscriptions.includes(channelId),
     );
@@ -41,7 +41,7 @@ export const process = (response: unknown) => {
       Bot.post(server, entry.title, entry.link);
     }
     Bot.log(server).success(message, title, Object.entries(rest), {
-      footer: videoId,
+      footer: `[${id}](${link})`,
       ...(skip && { color: 'MUTED' }),
     });
   } catch (error) {

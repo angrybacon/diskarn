@@ -21,6 +21,7 @@ export const zNotification = z
       entry: z
         .object({
           author: z.object({ name: zText }).transform((it) => it.name),
+          id: zText,
           link: z.union([
             zLink,
             // NOTE Sometimes the notification contains localized links, let's
