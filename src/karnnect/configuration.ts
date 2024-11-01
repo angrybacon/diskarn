@@ -26,8 +26,13 @@ export const CONFIGURATION: {
 }[] = [
   {
     channels: { logs: '1294803194173456496', videos: '1294371636094701670' },
+    server: 'KORUMITE',
+    subscriptions: Object.values(SUBSCRIPTIONS),
+  },
+  {
+    channels: { logs: '1294803194173456496', videos: '1294371636094701670' },
     filter: /[\w-]day|ddft|tainted/i,
-    server: 'DOOMSDAY',
+    server: 'KORUMITE2',
     subscriptions: [
       SUBSCRIPTIONS.DDFT_GUY,
       SUBSCRIPTIONS.DOISHY,
@@ -36,10 +41,5 @@ export const CONFIGURATION: {
       SUBSCRIPTIONS.REVENANTKIOKU,
       SUBSCRIPTIONS.SAWATARIX,
     ],
-  },
-  {
-    channels: { logs: '1294803194173456496', videos: '1294371636094701670' },
-    server: 'KORUMITE',
-    subscriptions: Object.values(SUBSCRIPTIONS),
   },
 ];

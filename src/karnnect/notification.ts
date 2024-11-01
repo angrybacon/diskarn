@@ -1,13 +1,15 @@
 import { Bot } from '../bot/bot';
-import { type SERVERS } from '../bot/configuration';
+import { SERVERS } from '../bot/configuration';
 import { CONFIGURATION } from './configuration';
 import { logger } from './logger';
 import { zNotification, type Notification } from './models';
 
-const history: Record<keyof typeof SERVERS, Set<string>> = {
-  KORUMITE: new Set(),
-  KORUMITE2: new Set(),
-};
+const history = (Object.keys(SERVERS) as (keyof typeof SERVERS)[]).reduce(
+  (accumulator, name) => {
+    return { ...accumulator, [name]: new Set() };
+  },
+  {} as Record<keyof typeof SERVERS, Set<string>>,
+);
 
 const validate = (
   server: keyof typeof SERVERS,
