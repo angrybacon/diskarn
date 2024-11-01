@@ -19,20 +19,13 @@ export const SUBSCRIPTIONS =
   } as const satisfies Record<string, string>;
 
 export const CONFIGURATION: {
-  channels: { logs: string; videos: string };
   filter?: RegExp;
   server: keyof typeof SERVERS;
   subscriptions: string[];
 }[] = [
   {
-    channels: { logs: '1294803194173456496', videos: '1294371636094701670' },
-    server: 'KORUMITE',
-    subscriptions: Object.values(SUBSCRIPTIONS),
-  },
-  {
-    channels: { logs: '1294803194173456496', videos: '1294371636094701670' },
     filter: /[\w-]day|ddft|tainted/i,
-    server: 'KORUMITE2',
+    server: 'DOOMSDAY',
     subscriptions: [
       SUBSCRIPTIONS.DDFT_GUY,
       SUBSCRIPTIONS.DOISHY,
@@ -41,5 +34,9 @@ export const CONFIGURATION: {
       SUBSCRIPTIONS.REVENANTKIOKU,
       SUBSCRIPTIONS.SAWATARIX,
     ],
+  },
+  {
+    server: 'KORUMITE',
+    subscriptions: Object.values(SUBSCRIPTIONS),
   },
 ];
