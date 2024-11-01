@@ -5,8 +5,8 @@ import { logger } from './logger';
 import { zNotification, type Notification } from './models';
 
 const history: Record<keyof typeof SERVERS, Set<string>> = {
-  DOOMSDAY: new Set(),
   KORUMITE: new Set(),
+  KORUMITE2: new Set(),
 };
 
 const validate = (

@@ -5,6 +5,8 @@ export const SUBSCRIPTIONS =
   {
     // Magic: the Gathering
     BOSH_N_ROLL:     'UCbp891F6oKl7YOwi5D2IdzQ',
+    DDFT_GUY:        'UCD0Os6qvXicEZl6gJ_xPXGw',
+    DOISHY:          'UC_sW93YGx7piZSIRakTnkrA',
     JAMES_KISAU:     'UC9RHzw4K7cJkZMvh8VHOcJw',
     JUDGING_FTW:     'UCXSRAZVZjPSVx5OKLPEeS-Q',
     NEVILSHUTE:      'UC96xkSiGHqjAa_dfnf46NtQ',
@@ -27,6 +29,8 @@ export const CONFIGURATION: {
     filter: /[\w-]day|ddft|tainted/i,
     server: 'DOOMSDAY',
     subscriptions: [
+      SUBSCRIPTIONS.DDFT_GUY,
+      SUBSCRIPTIONS.DOISHY,
       SUBSCRIPTIONS.JAMES_KISAU,
       SUBSCRIPTIONS.NEVILSHUTE,
       SUBSCRIPTIONS.REVENANTKIOKU,
