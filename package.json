@@ -8,6 +8,9 @@
   "version": "0.1.0",
   "scripts": {
     "build": "tsc",
+    "database:push": "dotenvx run --convention=nextjs -- drizzle-kit push",
+    "database:generate": "dotenvx run --convention=nextjs -- drizzle-kit generate",
+    "database:migrate": "dotenvx run --convention=nextjs -- drizzle-kit migrate",
     "dev": "dotenvx run --convention=nextjs -- tsx watch src/index.ts",
     "lint": "pnpm run '/^lint:[^:]+$/'",
     "lint:format": "prettier --check src/",
@@ -18,7 +21,9 @@
   "dependencies": {
     "@discordeno/bot": "19.0.0-next.76ad81d",
     "@dotenvx/dotenvx": "1.21.1",
+    "@libsql/client": "0.14.0",
     "chalk": "4.1.2",
+    "drizzle-orm": "0.36.1",
     "fastify": "5.1.0",
     "node-schedule": "2.1.1",
     "xml-js": "1.6.11",
@@ -29,6 +34,7 @@
     "@korumite/ts": "1.1.0",
     "@types/node": "22.8.6",
     "@types/node-schedule": "2.1.7",
+    "drizzle-kit": "0.28.0",
     "knip": "5.36.1",
     "prettier": "3.3.3",
     "tsx": "4.19.2",

@@ -1,8 +1,15 @@
+import { drizzle } from 'drizzle-orm/libsql';
 import Fastify from 'fastify';
 import { xml2js } from 'xml-js';
 
-import { process as processNotification } from '../karnnect/notification';
+import { notificationTable } from '../../database/schema';
+import { Bot } from '../bot/bot';
+import { process as processChallenge } from '../karnnect/notification';
 import { logger } from './logger';
+
+if (!process.env.DB_NAME) throw new Error('Missing database name');
+
+const database = drizzle(process.env.DB_NAME);
 
 const server = Fastify();
 
@@ -38,8 +45,19 @@ server.get('/challenge', {
   },
 });
 
-server.post('/challenge', ({ body }) => {
-  processNotification(body);
+server.post('/challenge', async ({ body }) => {
+  const notifications = processChallenge(body);
+  const rows = await database
+    .insert(notificationTable)
+    .values(
+      notifications.map(({ notification, server }) => ({
+        id: notification.videoId,
+        server,
+      })),
+    )
+    .onConflictDoNothing()
+    .returning();
+  // TODO Bot.log all new saved rows
   return {};
 });
 
@@ -60,7 +78,7 @@ export const Server = {
       });
       logger.log(`Server running on ${address}`);
     } catch (error) {
-      logger.error(`${error}`);
+      logger.error(error);
       process.exit(1);
     }
   },

@@ -8,7 +8,10 @@ if (!process.env.TOKEN) throw new Error('Missing token');
 
 const bot = createBot({
   events: {
-    ready: (payload) => logger.log('Bot is ready', payload),
+    ready: (payload) => {
+      logger.log('Bot is ready', payload);
+      // Bot.log('KORUMITE').success('Foo');
+    },
   },
   token: process.env.TOKEN,
 });
