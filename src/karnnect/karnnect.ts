@@ -78,7 +78,7 @@ const subscribe = (options: {
  * addition to return nothing on subscription, yields HTML instead of JSON for
  * the diagnostic endpoint.
  */
-const diagnose = (options: {
+const _diagnose = (options: {
   /** The ID of the YouTube channel to diagnose */
   id: string;
   /** HMAC secret */

@@ -1,15 +1,19 @@
-import { drizzle } from 'drizzle-orm/libsql';
+import { drizzle } from 'drizzle-orm/node-postgres';
 import Fastify from 'fastify';
 import { xml2js } from 'xml-js';
 
 import { notificationTable } from '../../database/schema';
-import { Bot } from '../bot/bot';
 import { process as processChallenge } from '../karnnect/notification';
 import { logger } from './logger';
 
-if (!process.env.DB_NAME) throw new Error('Missing database name');
+if (!process.env.DATABASE_URL) throw new Error('Missing database connection');
 
-const database = drizzle(process.env.DB_NAME);
+const database = drizzle({
+  casing: 'snake_case',
+  connection: process.env.DATABASE_URL,
+});
+
+logger.log('Connected to PostgreSQL database');
 
 const server = Fastify();
 
@@ -49,15 +53,10 @@ server.post('/challenge', async ({ body }) => {
   const notifications = processChallenge(body);
   const rows = await database
     .insert(notificationTable)
-    .values(
-      notifications.map(({ notification, server }) => ({
-        id: notification.videoId,
-        server,
-      })),
-    )
+    .values(notifications)
     .onConflictDoNothing()
     .returning();
-  // TODO Bot.log all new saved rows
+  logger.log(rows);
   return {};
 });
 

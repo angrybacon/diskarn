@@ -1,7 +1,7 @@
-import { sqliteTable, text, unique } from 'drizzle-orm/sqlite-core';
+import { pgTable, text, unique } from 'drizzle-orm/pg-core';
 
-export const notificationTable = sqliteTable(
+export const notificationTable = pgTable(
   'notifications',
   { id: text().notNull(), server: text().notNull() },
-  ({ id, server }) => ({ uniqueIdOnServer: unique().on(id, server) }),
+  ({ id, server }) => [unique().on(id, server)],
 );

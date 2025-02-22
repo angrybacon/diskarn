@@ -28,7 +28,7 @@ currently pretty short.
 The code is open source for a reason. The code should be obvious and
 self-documenting but here is a short breakdown if you're that lazy.
 
-- =bot= :: Handle the connection and interaction with the Discord server. This
+- =bot= :: Handle the connection and interaction with the Discord servers. This
   is using [[https://discordeno.js.org/][Discordeno]] to interact with the
   Discord guilds.
 - =karnnect= :: Connect (get it?) to YouTube notifications. No polling here,
@@ -62,8 +62,9 @@ following steps don't work, it's probably your fault.
 
 ** Variables
 
+- =DATABASE_URL= :: Remote database URL
 - =HOST= :: Must be set to =0.0.0.0= when online
 - =PORT= :: You can largely ignore this, but is provided for customization
 - =SKIP_SUBSCRIPTION= :: Skip the subscription events to prevent the noise
-- =TOKEN= :: Your bot token
-- =WEBSUB_CALLBACK_DOMAIN= :: Where the server will be hosted
+- =TOKEN= :: Your Discord token
+- =WEBSUB_CALLBACK_DOMAIN= :: Where the Diskarn server will be hosted

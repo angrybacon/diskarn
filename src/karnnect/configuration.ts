@@ -1,5 +1,6 @@
 import { type SERVERS } from '../bot/configuration';
 
+/** List the channels available for subscription */
 export const SUBSCRIPTIONS =
   // prettier-ignore
   {
@@ -11,6 +12,7 @@ export const SUBSCRIPTIONS =
     NEVILSHUTE:      'UC96xkSiGHqjAa_dfnf46NtQ',
     REVENANTKIOKU:   'UCpPzTkbfd1LMdnWihwz2TVA',
     SAWATARIX:       'UCd9ApEL1lSWpgjDqdlpSYlg',
+    SEMIOTICIAN:     'UCZ0ERvBNUhBJ_yx3ewcRGFQ',
     // Other
     DELBA:           'UCfDr-ppda0G5apw_zxG2ClQ',
     GOPARISM:        'UCCRdRbI93UGW0AZttVH3SbA',
@@ -34,6 +36,7 @@ export const CONFIGURATION: {
       SUBSCRIPTIONS.NEVILSHUTE,
       SUBSCRIPTIONS.REVENANTKIOKU,
       SUBSCRIPTIONS.SAWATARIX,
+      SUBSCRIPTIONS.SEMIOTICIAN,
     ],
   },
   {
