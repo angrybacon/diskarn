@@ -2,6 +2,7 @@ import { drizzle } from 'drizzle-orm/node-postgres';
 import Fastify from 'fastify';
 import { xml2js } from 'xml-js';
 
+import { Bot } from '../bot/bot';
 import { notificationTable } from '../database/schema';
 import { process as processChallenge } from '../karnnect/notification';
 import { logger } from './logger';
@@ -53,10 +54,14 @@ server.post('/challenge', async ({ body }) => {
   const notifications = processChallenge(body);
   const rows = await database
     .insert(notificationTable)
-    .values(notifications)
+    .values(notifications.map(({ id, server }) => ({ id, server })))
     .onConflictDoNothing()
     .returning();
+  logger.log(`Inserted ${rows.length} rows`);
   logger.log(rows);
+  notifications.forEach(({ notification, server }) => {
+    Bot.post(server, notification.title, notification.link);
+  });
   return {};
 });
 
