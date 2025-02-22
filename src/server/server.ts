@@ -1,8 +1,19 @@
+import { drizzle } from 'drizzle-orm/node-postgres';
 import Fastify from 'fastify';
 import { xml2js } from 'xml-js';
 
-import { process as processNotification } from '../karnnect/notification';
+import { notificationTable } from '../../database/schema';
+import { process as processChallenge } from '../karnnect/notification';
 import { logger } from './logger';
+
+if (!process.env.DATABASE_URL) throw new Error('Missing database connection');
+
+const database = drizzle({
+  casing: 'snake_case',
+  connection: process.env.DATABASE_URL,
+});
+
+logger.log('Connected to PostgreSQL database');
 
 const server = Fastify();
 
@@ -38,8 +49,14 @@ server.get('/challenge', {
   },
 });
 
-server.post('/challenge', ({ body }) => {
-  processNotification(body);
+server.post('/challenge', async ({ body }) => {
+  const notifications = processChallenge(body);
+  const rows = await database
+    .insert(notificationTable)
+    .values(notifications)
+    .onConflictDoNothing()
+    .returning();
+  logger.log(rows);
   return {};
 });
 
@@ -59,8 +76,11 @@ export const Server = {
         port: parseInt(process.env.PORT),
       });
       logger.log(`Server running on ${address}`);
+      const rows = await database.select().from(notificationTable);
+      logger.log(`Found ${rows.length} existing rows in database`);
+      logger.log(rows);
     } catch (error) {
-      logger.error(`${error}`);
+      logger.error(error);
       process.exit(1);
     }
   },

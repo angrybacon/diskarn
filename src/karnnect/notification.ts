@@ -1,56 +1,32 @@
-import { Bot } from '../bot/bot';
 import { SERVERS } from '../bot/configuration';
 import { CONFIGURATION } from './configuration';
 import { logger } from './logger';
-import { zNotification, type Notification } from './models';
-
-const history = (Object.keys(SERVERS) as (keyof typeof SERVERS)[]).reduce(
-  (accumulator, name) => {
-    return { ...accumulator, [name]: new Set() };
-  },
-  {} as Record<keyof typeof SERVERS, Set<string>>,
-);
-
-const validate = (
-  server: keyof typeof SERVERS,
-  { title, videoId }: Notification,
-  filter?: RegExp,
-) => {
-  if (history[server].has(videoId)) {
-    return { skip: true, reason: 'duplicate' } as const;
-  }
-  if (filter && !title.match(filter)) {
-    return { skip: true, reason: 'filtered' } as const;
-  }
-  return { skip: false } as const;
-};
+import { zNotification } from './models';
 
 export const process = (response: unknown) => {
-  let server: keyof typeof SERVERS | undefined = undefined;
   try {
-    const entry = zNotification.parse(response);
-    const { channelId, id, link, title, videoId, ...rest } = entry;
-    const configuration = Object.values(CONFIGURATION).find((it) =>
-      it.subscriptions.includes(channelId),
+    const notification = zNotification.parse(response);
+    const matches = Object.values(CONFIGURATION).filter(({ subscriptions }) =>
+      subscriptions.includes(notification.channelId),
     );
-    if (!configuration) throw new Error('Missing configuration');
-    server = configuration.server;
-    const { reason, skip } = validate(server, entry, configuration.filter);
-    const message = 'New notification' + (reason ? ` (${reason})` : '');
-    logger.log(`[${server}] ${message}`, entry);
-    if (!skip) {
-      history[server].add(entry.videoId);
-      Bot.post(server, entry.title, entry.link);
+    if (!matches.length) {
+      logger.error('Unhandled notification', notification);
+      throw new Error('Unhandled notification');
     }
-    Bot.log(server).success(
-      message,
-      `[${title}](${link})`,
-      Object.entries(rest),
-      { footer: id, ...(skip && { color: 'MUTED' }) },
+    return matches.reduce(
+      (accumulator, { filter, server }) => {
+        if (filter && !notification.title.match(filter)) {
+          logger.log(`Skipped notification for "${server}"`, notification);
+          return accumulator;
+        }
+        logger.log(`New notification for "${server}"`, notification);
+        return [...accumulator, { id: notification.videoId, server }];
+      },
+      [] as { id: string; server: keyof typeof SERVERS }[],
     );
   } catch (error) {
     const message = error instanceof Error ? error.message : `${error}`;
-    logger.error(`[${server}] Could not read notification`, message, response);
-    if (server) Bot.log(server).error('Could not read notification', message);
+    logger.error('Could not read notification', message, response);
   }
+  return [];
 };

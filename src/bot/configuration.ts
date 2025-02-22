@@ -1,3 +1,8 @@
+/**
+ * List all supported Discord servers.
+ * Each server should include a log channel and another channel for the video
+ * posts.
+ */
 export const SERVERS =
   // prettier-ignore
   {

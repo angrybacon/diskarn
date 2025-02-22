@@ -50,8 +50,6 @@ export const zNotification = z
   })
   .transform((it) => it.feed.entry);
 
-export type Notification = z.infer<typeof zNotification>;
-
 const CHANNEL_RE = /^[A-Za-z0-9_-]{24}$/;
 
 export const zSubscriptions = z.record(
