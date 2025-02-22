@@ -1,3 +1,5 @@
+import { z } from 'zod';
+
 import { SERVERS } from '../bot/configuration';
 import { CONFIGURATION } from './configuration';
 import { logger } from './logger';
@@ -20,9 +22,16 @@ export const process = (response: unknown) => {
           return accumulator;
         }
         logger.log(`New notification for "${server}"`, notification);
-        return [...accumulator, { id: notification.videoId, server }];
+        return [
+          ...accumulator,
+          { id: notification.videoId, notification, server },
+        ];
       },
-      [] as { id: string; server: keyof typeof SERVERS }[],
+      [] as {
+        id: string;
+        notification: z.infer<typeof zNotification>;
+        server: keyof typeof SERVERS;
+      }[],
     );
   } catch (error) {
     const message = error instanceof Error ? error.message : `${error}`;
