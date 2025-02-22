@@ -76,6 +76,9 @@ export const Server = {
         port: parseInt(process.env.PORT),
       });
       logger.log(`Server running on ${address}`);
+      const rows = await database.select().from(notificationTable);
+      logger.log(`Found ${rows.length} existing rows in database`);
+      logger.log(rows);
     } catch (error) {
       logger.error(error);
       process.exit(1);

@@ -28,7 +28,7 @@ export const CONFIGURATION: {
 }[] = [
   {
     filter: /[\w-]day|ddft|tainted/i,
-    server: 'DOOMSDAY',
+    server: 'KORUMITE',
     subscriptions: [
       SUBSCRIPTIONS.DDFT_GUY,
       SUBSCRIPTIONS.DOISHY,
