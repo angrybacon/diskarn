@@ -1,7 +1,5 @@
 import { type Bot } from '@discordeno/bot';
 
-import { CHANNELS } from './constants';
-
 const COLORS = {
   DANGER: 0xf44336,
   MUTED: 0x607d8b,
@@ -18,7 +16,7 @@ const FORMATTERS = {
 
 export type EmbedOptions = {
   body?: string;
-  /** Whether the body should be rendered with a code block. */
+  /** Whether the body should be rendered with a code block */
   code?: true;
   color?: keyof typeof COLORS;
   fields?: [name: string, value: string][];

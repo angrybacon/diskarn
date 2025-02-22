@@ -7,7 +7,7 @@ import { notificationTable } from '../database/schema';
 import { process as processChallenge } from '../karnnect/notification';
 import { logger } from './logger';
 
-if (!process.env.DATABASE_URL) throw new Error('Missing database connection');
+if (!process.env.DATABASE_URL) throw new Error('Missing database URL');
 
 const database = drizzle({
   casing: 'snake_case',

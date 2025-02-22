@@ -27,6 +27,7 @@ export const Bot = {
         logger.error(error);
       }
     },
+
     success: async (
       title: EmbedOptions['title'],
       body?: EmbedOptions['body'],
