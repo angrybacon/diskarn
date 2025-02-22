@@ -2,7 +2,7 @@ import { drizzle } from 'drizzle-orm/node-postgres';
 import Fastify from 'fastify';
 import { xml2js } from 'xml-js';
 
-import { notificationTable } from '../../database/schema';
+import { notificationTable } from '../database/schema';
 import { process as processChallenge } from '../karnnect/notification';
 import { logger } from './logger';
 
