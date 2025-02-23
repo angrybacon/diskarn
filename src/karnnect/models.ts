@@ -25,7 +25,7 @@ export const zNotification = z
           link: z.union([
             zLink,
             // NOTE Sometimes the notification contains localized links, let's
-            //      test it out and see whether returning the first one always
+            //      test it out and see whether always returning the first one
             //      is good enough.
             zLink
               .array()

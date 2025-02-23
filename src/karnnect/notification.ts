@@ -13,7 +13,6 @@ export const process = (response: unknown) => {
     );
     if (!matches.length) {
       logger.error('Unhandled notification', notification);
-      throw new Error('Unhandled notification');
     }
     return matches.reduce(
       (accumulator, { filter, server }) => {
@@ -35,7 +34,7 @@ export const process = (response: unknown) => {
     );
   } catch (error) {
     const message = error instanceof Error ? error.message : `${error}`;
-    logger.error('Could not read notification', message, response);
+    logger.error(`Could not read notification "${message}"`, response);
   }
   return [];
 };

@@ -13,6 +13,7 @@ export const SUBSCRIPTIONS =
     REVENANTKIOKU:   'UCpPzTkbfd1LMdnWihwz2TVA',
     SAWATARIX:       'UCd9ApEL1lSWpgjDqdlpSYlg',
     SEMIOTICIAN:     'UCZ0ERvBNUhBJ_yx3ewcRGFQ',
+    THE_EPIC_STORM:  'UCajJn-d7ngRJwVh1YBmHzzw',
     // Other
     DELBA:           'UCfDr-ppda0G5apw_zxG2ClQ',
     GOPARISM:        'UCCRdRbI93UGW0AZttVH3SbA',
@@ -37,6 +38,7 @@ export const CONFIGURATION: {
       SUBSCRIPTIONS.REVENANTKIOKU,
       SUBSCRIPTIONS.SAWATARIX,
       SUBSCRIPTIONS.SEMIOTICIAN,
+      SUBSCRIPTIONS.THE_EPIC_STORM,
     ],
   },
   {
