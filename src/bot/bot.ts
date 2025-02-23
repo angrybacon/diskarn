@@ -1,8 +1,8 @@
 import { ActivityTypes, createBot } from '@discordeno/bot';
 
-import { embed, post, type EmbedOptions } from '../bot/write';
 import { SERVERS } from './configuration';
 import { logger } from './logger';
+import { embed, post, type EmbedOptions } from './write';
 
 if (!process.env.TOKEN) throw new Error('Missing token');
 
