@@ -16,6 +16,7 @@
     "lint:typings": "tsc --noEmit",
     "start": "dotenvx run --convention=nextjs -- node .",
     "test": "dotenvx run --convention=nextjs -- jest",
+    "test:coverage": "pnpm run test --coverage",
     "test:watch": "pnpm run test --watch"
   },
   "dependencies": {
