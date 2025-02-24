@@ -59,9 +59,12 @@ server.post('/challenge', async ({ body }) => {
       .onConflictDoNothing()
       .returning();
     logger.log(`Inserted ${rows.length} rows`, rows);
-    notifications.forEach(({ notification, server }) => {
-      Bot.post(server, notification.title, notification.link);
-    });
+    const ids = rows.map((row) => row.id);
+    notifications
+      .filter(({ id }) => ids.includes(id))
+      .forEach(({ notification, server }) => {
+        Bot.post(server, notification.title, notification.link);
+      });
   }
   return {};
 });
