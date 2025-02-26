@@ -59,12 +59,14 @@ server.post('/challenge', async ({ body }) => {
       .onConflictDoNothing()
       .returning();
     logger.log(`Inserted ${rows.length} rows`, rows);
-    const ids = rows.map((row) => row.id);
-    notifications
-      .filter(({ id }) => ids.includes(id))
-      .forEach(({ notification, server }) => {
+    const inserted = rows.map((row) => row.id);
+    notifications.forEach(({ id, notification, server }) => {
+      if (inserted.includes(id)) {
         Bot.post(server, notification.title, notification.link);
-      });
+      } else {
+        logger.log(`Skipped ${server} notification, found "${id}" in database`);
+      }
+    });
   }
   return {};
 });

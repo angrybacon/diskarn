@@ -16,11 +16,13 @@ export const process = (response: unknown) => {
     }
     return matches.reduce(
       (accumulator, { filter, server }) => {
-        if (filter && !notification.title.match(filter)) {
-          logger.log(`Skipped notification for "${server}"`, notification);
+        if (filter && !filter.test(notification.title)) {
+          logger.log(
+            `Skipped ${server} notification, title did not match`,
+            `Title: "${notification.title}"`,
+          );
           return accumulator;
         }
-        logger.log(`New notification for "${server}"`, notification);
         return [
           ...accumulator,
           { id: notification.videoId, notification, server },
