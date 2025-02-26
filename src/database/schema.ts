@@ -1,7 +1,7 @@
-import { pgTable, text, unique } from 'drizzle-orm/pg-core';
+import { pgTable, primaryKey, text } from 'drizzle-orm/pg-core';
 
 export const notificationTable = pgTable(
   'notifications',
   { id: text().notNull(), server: text().notNull() },
-  ({ id, server }) => [unique().on(id, server)],
+  ({ id, server }) => [primaryKey({ columns: [id, server] })],
 );
