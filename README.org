@@ -67,4 +67,5 @@ following steps don't work, it's probably your fault.
 - =PORT= :: You can largely ignore this, but is provided for customization
 - =SKIP_SUBSCRIPTION= :: Skip the subscription events to prevent the noise
 - =TOKEN= :: Your Discord token
+- =VERBOSE= :: Whether it should log more about what it's currently doing
 - =WEBSUB_CALLBACK_DOMAIN= :: Where the Diskarn server will be hosted

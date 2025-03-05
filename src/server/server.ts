@@ -4,7 +4,7 @@ import { xml2js } from 'xml-js';
 
 import { Bot } from '../bot/bot';
 import { notificationTable } from '../database/schema';
-import { process as processChallenge } from '../karnnect/notification';
+import { processChallenge } from '../karnnect/processors';
 import { logger } from './logger';
 
 if (!process.env.DATABASE_URL) throw new Error('Missing database URL');

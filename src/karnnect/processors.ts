@@ -5,8 +5,11 @@ import { CONFIGURATION } from './configuration';
 import { logger } from './logger';
 import { zNotification } from './models';
 
-export const process = (response: unknown) => {
+export const processChallenge = (response: unknown) => {
   try {
+    if (process.env.VERBOSE === '1') {
+      logger.log('Received new challenge response', response);
+    }
     const notification = zNotification.parse(response);
     const matches = Object.values(CONFIGURATION).filter(({ subscriptions }) =>
       subscriptions.includes(notification.channelId),
@@ -19,7 +22,8 @@ export const process = (response: unknown) => {
         if (filter && !filter.test(notification.title)) {
           logger.log(
             `Skipped ${server} notification, title did not match`,
-            `Title: "${notification.title}"`,
+            `  Author: "${notification.author}"`,
+            `  Title: "${notification.title}"`,
           );
           return accumulator;
         }
