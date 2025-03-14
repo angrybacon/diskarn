@@ -42,11 +42,9 @@ self-documenting but here is a short breakdown if you're that lazy.
 there's currently no way to filter out some events eg. if the channel author
 edits the video title, your callback endpoint will receive a new notification.
 
-Since this project is small enough, a local =Set= in memory is probably enough
-to prevent /duplicate/ notifications. The counterpart is that it assumes the bot
-is deployed in a single instance for each of your servers (or a single instance
-for all your servers). If not, each instance will have their own =Set= and
-uniqueness will not be reliable.
+This used to rely on a local =Set= in order to prevent duplicate notifications
+and assumed that the bot was deployed in a single instance. Uniqueness should
+now be handled in a dedicated database.
 #+END_QUOTE
 
 ** Installation
