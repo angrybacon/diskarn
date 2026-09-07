@@ -7,6 +7,7 @@ export const SUBSCRIPTIONS =
     // Magic: the Gathering
     DDFT_GUY:        'UCD0Os6qvXicEZl6gJ_xPXGw',
     DOISHY:          'UC_sW93YGx7piZSIRakTnkrA',
+    EUREKA_22422:    'UCo7oflN0vnWcBlLxuPSADIA',
     JAMES_KISAU:     'UC9RHzw4K7cJkZMvh8VHOcJw',
     JUDGING_FTW:     'UCXSRAZVZjPSVx5OKLPEeS-Q',
     NEVILSHUTE:      'UC96xkSiGHqjAa_dfnf46NtQ',
@@ -44,12 +45,9 @@ export const CONFIGURATION: {
   {
     server: 'KORUMITE',
     subscriptions: [
-      SUBSCRIPTIONS.DELBA,
-      SUBSCRIPTIONS.GOPARISM,
       SUBSCRIPTIONS.JUDGING_FTW,
       SUBSCRIPTIONS.MATT_POCOCK,
       SUBSCRIPTIONS.PROTESILAOS,
-      SUBSCRIPTIONS.T3DOTGG,
     ],
   },
 ];
