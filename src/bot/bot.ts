@@ -56,14 +56,25 @@ export const Bot = {
     }
   },
 
-  start: () => bot.start(),
+  start: async () => {
+    try {
+      await bot.start();
+    } catch (error) {
+      logger.error(error);
+      process.exit(1);
+    }
+  },
 
   status: async (state: string) => {
-    await bot.gateway.editBotStatus({
-      activities: [{ name: 'Ready', state, type: ActivityTypes.Custom }],
-      status: 'online',
-    });
-    logger.log(`New status "${state}"`);
+    try {
+      await bot.gateway.editBotStatus({
+        activities: [{ name: 'Ready', state, type: ActivityTypes.Custom }],
+        status: 'online',
+      });
+      logger.log(`New status "${state}"`);
+    } catch (error) {
+      logger.error(error);
+    }
   },
 
   stop: () => bot.shutdown(),

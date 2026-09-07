@@ -1,10 +1,11 @@
 {
   "engines": {
-    "node": "22.19.0"
+    "node": "24.20.0"
   },
-  "main": "dist/index.js",
   "name": "diskarn",
+  "packageManager": "pnpm@12.3.4",
   "private": true,
+  "type": "module",
   "version": "0.1.0",
   "scripts": {
     "build": "tsc",
@@ -12,37 +13,36 @@
     "dev": "dotenvx run --convention=nextjs -- tsx watch src/index.ts",
     "lint": "pnpm run '/^lint:[^:]+$/'",
     "lint:format": "prettier --check --log-level warn src/",
-    "lint:prune": "dotenvx run --convention=nextjs -- knip",
-    "lint:typings": "tsc --noEmit",
-    "start": "dotenvx run --convention=nextjs -- node .",
-    "test": "dotenvx run --convention=nextjs -- jest",
+    "lint:prune": "DATABASE_URL=1 knip",
+    "lint:typings": "tsc",
+    "start": "dotenvx run --convention=nextjs -- tsx src/index.ts",
+    "test": "vitest run",
     "test:coverage": "pnpm run test --coverage",
     "test:watch": "pnpm run test --watch"
   },
   "dependencies": {
     "@discordeno/bot": "21.0.0",
-    "@dotenvx/dotenvx": "1.49.0",
-    "chalk": "4.1.2",
-    "drizzle-orm": "0.44.5",
-    "fastify": "5.6.0",
+    "@dotenvx/dotenvx": "2.23.0",
+    "chalk": "6.0.0",
+    "drizzle-orm": "0.45.2",
+    "fastify": "5.12.3",
     "node-schedule": "2.1.1",
-    "pg": "8.16.3",
+    "pg": "8.23.0",
+    "tsx": "4.23.13",
     "xml-js": "1.6.11",
-    "zod": "3.25.76"
+    "zod": "4.5.4"
   },
   "devDependencies": {
-    "@ianvs/prettier-plugin-sort-imports": "4.7.0",
-    "@korumite/ts": "1.1.0",
-    "@types/jest": "29.5.14",
-    "@types/node": "22.18.3",
+    "@ianvs/prettier-plugin-sort-imports": "4.7.1",
+    "@korumite/ts": "1.7.0",
+    "@types/node": "26.5.0",
     "@types/node-schedule": "2.1.8",
-    "@types/pg": "8.15.5",
-    "drizzle-kit": "0.31.4",
-    "jest": "29.7.0",
-    "knip": "5.63.1",
-    "prettier": "3.6.2",
-    "ts-jest": "29.4.1",
-    "tsx": "4.20.5",
-    "typescript": "5.9.2"
+    "@types/pg": "8.23.1",
+    "@vitest/coverage-v8": "5.0.0",
+    "drizzle-kit": "0.31.10",
+    "knip": "6.34.0",
+    "prettier": "3.9.6",
+    "typescript": "7.0.2",
+    "vitest": "5.0.0"
   }
 }

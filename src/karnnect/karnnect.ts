@@ -25,11 +25,16 @@ export const karnnect = async () => {
     logger.log(`Dry-configured new subscriptions`, subscriptions);
     return;
   }
-  for (const [name, id] of Object.entries(subscriptions)) {
-    const lease = 10 * 24 * 60 * 60;
-    const { ok, status, statusText } = await subscribe({ id, lease });
-    if (!ok) throw new Error(`${status} ${statusText}`);
-    logger.log(`Subscribed "${name}"`);
+  try {
+    for (const [name, id] of Object.entries(subscriptions)) {
+      const lease = 10 * 24 * 60 * 60;
+      const { ok, status, statusText } = await subscribe({ id, lease });
+      if (!ok) throw new Error(`${status} ${statusText}`);
+      logger.log(`Subscribed "${name}"`);
+    }
+  } catch (error) {
+    logger.error(error);
+    return;
   }
   return Promise.all([
     ...Object.keys(SERVERS).map((server) =>
@@ -78,6 +83,7 @@ const subscribe = (options: {
  * addition to return nothing on subscription, yields HTML instead of JSON for
  * the diagnostic endpoint.
  */
+// @ts-expect-error Unused by the program but kept for manual diagnostics
 const _diagnose = (options: {
   /** The ID of the YouTube channel to diagnose */
   id: string;

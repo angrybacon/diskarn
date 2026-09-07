@@ -1,15 +1,16 @@
 import { Writable } from 'stream';
-import chalk, { type Chalk } from 'chalk';
+import chalk, { type ChalkInstance } from 'chalk';
 
 const DOMAINS =
   // prettier-ignore
   {
     BOT:      ['bot',      chalk.cyan],
     KARNNECT: ['karnnect', chalk.magenta],
+    ROOT:     ['process',  chalk.red],
     SERVER:   ['server',   chalk.yellow],
   } as const satisfies Record<
     Uppercase<string>,
-    [Lowercase<string>, Chalk]
+    [Lowercase<string>, ChalkInstance]
   >;
 
 export const Logger = (scope: keyof typeof DOMAINS) => {

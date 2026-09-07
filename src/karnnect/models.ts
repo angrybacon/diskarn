@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import * as z from 'zod';
 
 const toDiscordTimestamp = (timestamp: string) =>
   `<t:${Math.floor(new Date(timestamp).getTime() / 1000)}:f>`;
@@ -27,10 +27,7 @@ export const zNotification = z
             // NOTE Sometimes the notification contains localized links, let's
             //      test it out and see whether always returning the first one
             //      is good enough.
-            zLink
-              .array()
-              .nonempty()
-              .transform(([it]) => it),
+            z.tuple([zLink], zLink).transform(([it]) => it),
           ]),
           published: zDate,
           title: zText,

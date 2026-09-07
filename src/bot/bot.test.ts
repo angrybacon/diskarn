@@ -1,13 +1,18 @@
+import { describe, expect, it, vi } from 'vitest';
+
 import { Bot } from './bot';
 import { logger } from './logger';
 import { embed, post } from './write';
 
-jest.mock('@discordeno/bot');
-jest.mock('./logger');
-jest.mock('./write');
+vi.mock('@discordeno/bot');
+vi.mock('./logger');
+vi.mock('./write');
+
+// NOTE `bot.ts` reads `TOKEN` at import time
+vi.hoisted(() => (process.env.TOKEN = '4815162342'));
 
 describe('Bot', () => {
-  describe(Bot.log.name, () => {
+  describe(Bot.log, () => {
     it('should log an error message', async () => {
       // When
       await Bot.log('KORUMITE').error('Title', 'Body');
@@ -22,7 +27,7 @@ describe('Bot', () => {
 
     it('should handle errors for error logs', async () => {
       // Given
-      jest.mocked(embed).mockRejectedValueOnce('Error');
+      vi.mocked(embed).mockRejectedValueOnce('Error');
       // When
       await Bot.log('KORUMITE').error('Title', 'Body');
       // Then
@@ -56,7 +61,7 @@ describe('Bot', () => {
 
     it('should handle errors for success logs', async () => {
       // Given
-      jest.mocked(embed).mockRejectedValueOnce('Error');
+      vi.mocked(embed).mockRejectedValueOnce('Error');
       // When
       await Bot.log('KORUMITE').success('Title');
       // Then
@@ -65,7 +70,7 @@ describe('Bot', () => {
     });
   });
 
-  describe(Bot.post.name, () => {
+  describe(Bot.post, () => {
     it('should post message', async () => {
       // When
       await Bot.post('KORUMITE', 'Title', 'Body');
@@ -81,7 +86,7 @@ describe('Bot', () => {
 
     it('should handle errors', async () => {
       // Given
-      jest.mocked(post).mockRejectedValueOnce('Error');
+      vi.mocked(post).mockRejectedValueOnce('Error');
       // When
       await Bot.post('KORUMITE', 'Title', 'Body');
       // Then
