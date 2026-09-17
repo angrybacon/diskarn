@@ -1,11 +1,13 @@
+import type { JsonSchemaToTsProvider } from '@fastify/type-provider-json-schema-to-ts';
+
 import { drizzle } from 'drizzle-orm/node-postgres';
 import Fastify from 'fastify';
 import { xml2js } from 'xml-js';
 
-import { Bot } from '../bot/bot';
-import { notificationTable } from '../database/schema';
-import { processChallenge } from '../karnnect/processors';
-import { logger } from './logger';
+import { Bot } from '~/bot/bot';
+import { notificationsTable } from '~/database/schema';
+import { processChallenge } from '~/karnnect/processors';
+import { logger } from '~/server/logger';
 
 if (!process.env.DATABASE_URL) throw new Error('Missing database URL');
 
@@ -16,9 +18,9 @@ const database = drizzle({
 
 logger.log('Connected to PostgreSQL database');
 
-const server = Fastify();
+const f = Fastify().withTypeProvider<JsonSchemaToTsProvider>();
 
-server.addContentTypeParser(
+f.addContentTypeParser(
   'application/atom+xml',
   { parseAs: 'buffer' },
   (_request, body, done) => {
@@ -26,18 +28,18 @@ server.addContentTypeParser(
       const data = xml2js(body.toString(), { compact: true });
       done(null, data);
     } catch (error) {
-      done(error instanceof Error ? error : new Error(`${error}`));
+      done(error instanceof Error ? error : new Error(String(error)));
     }
   },
 );
 
-server.addHook('onError', (_request, _reply, error) =>
+f.addHook('onError', (_request, _reply, error) =>
   logger.error(`An error occurred "${error.message}"`),
 );
 
-server.get('/challenge', {
+f.get('/challenge', {
   handler: ({ query }) => {
-    const challenge = (query as { 'hub.challenge': string })['hub.challenge'];
+    const challenge = query['hub.challenge'];
     logger.log(`Verification challenge received "${challenge}"`);
     return challenge;
   },
@@ -50,19 +52,21 @@ server.get('/challenge', {
   },
 });
 
-server.post('/challenge', async ({ body }) => {
+f.post('/challenge', async ({ body }) => {
   const notifications = processChallenge(body);
   if (notifications.length) {
     const rows = await database
-      .insert(notificationTable)
+      .insert(notificationsTable)
       .values(notifications.map(({ id, server }) => ({ id, server })))
       .onConflictDoNothing()
       .returning();
     logger.log(`Inserted ${rows.length} rows`, rows);
+    // NOTE Bounded by `CONFIGURATION.length`, a `Set` is never worth it
+    // oxlint-disable-next-line unicorn/prefer-set-has
     const inserted = rows.map((row) => row.id);
     notifications.forEach(({ id, notification, server }) => {
       if (inserted.includes(id)) {
-        Bot.post(server, notification.title, notification.link);
+        void Bot.post(server, notification.title, notification.link);
       } else {
         logger.log(`Skipped ${server} notification, found "${id}" in database`);
       }
@@ -71,7 +75,7 @@ server.post('/challenge', async ({ body }) => {
   return {};
 });
 
-server.get('/hello', () => {
+f.get('/hello', () => {
   const message = 'Which Karn?';
   logger.log(message);
   return message;
@@ -82,17 +86,17 @@ export const Server = {
     try {
       if (!process.env.HOST) throw new Error('Missing host');
       if (!process.env.PORT) throw new Error('Missing port');
-      const address = await server.listen({
+      const address = await f.listen({
         host: process.env.HOST,
-        port: parseInt(process.env.PORT),
+        port: Math.trunc(Number(process.env.PORT)),
       });
       logger.log(`Server running on ${address}`);
-      const rows = await database.select().from(notificationTable);
+      const rows = await database.select().from(notificationsTable);
       logger.log(`Found ${rows.length} existing rows in database`);
     } catch (error) {
       logger.error(error);
       process.exit(1);
     }
   },
-  stop: () => server.close(),
+  stop: () => f.close(),
 } as const;

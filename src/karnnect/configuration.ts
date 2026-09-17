@@ -1,4 +1,4 @@
-import { type SERVERS } from '../bot/configuration';
+import type { SERVERS } from '~/bot/configuration';
 
 /** List the channels available for subscription */
 export const SUBSCRIPTIONS =
@@ -29,7 +29,7 @@ export const CONFIGURATION: {
   subscriptions: string[];
 }[] = [
   {
-    filter: /\bddft\b|\w*oomsday\b/i,
+    filter: /\bddft\b|\w*oomsday\b/iu,
     server: 'DOOMSDAY',
     subscriptions: [
       SUBSCRIPTIONS.DDFT_GUY,

@@ -1,8 +1,10 @@
+import type { EmbedOptions } from '~/bot/write';
+
 import { ActivityTypes, createBot } from '@discordeno/bot';
 
-import { SERVERS } from './configuration';
-import { logger } from './logger';
-import { embed, post, type EmbedOptions } from './write';
+import { SERVERS } from '~/bot/configuration';
+import { logger } from '~/bot/logger';
+import { embed, post } from '~/bot/write';
 
 if (!process.env.TOKEN) throw new Error('Missing token');
 
@@ -17,7 +19,7 @@ export const Bot = {
   log: (server: keyof typeof SERVERS) => ({
     error: async (title: EmbedOptions['title'], body: EmbedOptions['body']) => {
       try {
-        return await embed(bot, SERVERS[server].logs, {
+        await embed(bot, SERVERS[server].logs, {
           body,
           code: true,
           color: 'DANGER',
@@ -35,7 +37,7 @@ export const Bot = {
       options?: Omit<EmbedOptions, 'body' | 'fields' | 'title'>,
     ) => {
       try {
-        return await embed(bot, SERVERS[server].logs, {
+        await embed(bot, SERVERS[server].logs, {
           body,
           color: 'SUCCESS',
           fields,
@@ -50,7 +52,7 @@ export const Bot = {
 
   post: async (server: keyof typeof SERVERS, name: string, content: string) => {
     try {
-      return await post(bot, SERVERS[server].videos, name, content);
+      await post(bot, SERVERS[server].videos, name, content);
     } catch (error) {
       logger.error(error);
     }

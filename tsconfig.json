@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
-    "declaration": false,
-    "noEmit": true
+    "noEmit": true,
+    "paths": { "~/*": ["./src/*"] }
   },
   "extends": "./node_modules/@korumite/ts/tsconfig.nodom.json"
 }

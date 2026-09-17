@@ -1,4 +1,4 @@
-import { type Bot } from '@discordeno/bot';
+import type { Bot } from '@discordeno/bot';
 
 const COLORS = {
   DANGER: 0xf44336,
@@ -8,7 +8,7 @@ const COLORS = {
 
 const FORMATTERS = {
   code: (input: string, language?: 'json') =>
-    [`\`\`\`${language || ''}`, input, '```'].join('\n'),
+    [`\`\`\`${language ?? ''}`, input, '```'].join('\n'),
   list: (...inputs: [string, ...string[]]) =>
     inputs.map((input) => `- ${input}`).join('\n'),
   verbatim: (input: string) => `\`${input}\``,
@@ -44,9 +44,9 @@ export const embed = (
             name,
             value,
           }))
-          .sort((a, b) => a.name.localeCompare(b.name))
-          .sort((a, b) => Number(a.inline) - Number(b.inline)),
-        timestamp: options.timestamp || new Date().toISOString(),
+          .toSorted((a, b) => a.name.localeCompare(b.name))
+          .toSorted((a, b) => Number(a.inline) - Number(b.inline)),
+        timestamp: options.timestamp ?? new Date().toISOString(),
         title: options.title,
         ...(options.footer && { footer: { text: options.footer } }),
       },

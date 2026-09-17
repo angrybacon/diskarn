@@ -1,8 +1,8 @@
-import { Bot } from '../bot/bot';
-import { SERVERS } from '../bot/configuration';
-import { SUBSCRIPTIONS } from './configuration';
-import { logger } from './logger';
-import { zSubscriptions } from './models';
+import { Bot } from '~/bot/bot';
+import { SERVERS } from '~/bot/configuration';
+import { SUBSCRIPTIONS } from '~/karnnect/configuration';
+import { logger } from '~/karnnect/logger';
+import { SubscriptionsSchema } from '~/karnnect/schemas';
 
 if (!process.env.WEBSUB_CALLBACK_DOMAIN)
   throw new Error('Missing callback domain');
@@ -20,31 +20,38 @@ const URLS = {
  * See <https://developers.google.com/youtube/v3/guides/push_notifications>.
  */
 export const karnnect = async () => {
-  const subscriptions = zSubscriptions.parse(SUBSCRIPTIONS);
+  const subscriptions = SubscriptionsSchema.parse(SUBSCRIPTIONS);
   if (process.env.SKIP_SUBSCRIPTION === '1') {
     logger.log(`Dry-configured new subscriptions`, subscriptions);
     return;
   }
-  try {
-    for (const [name, id] of Object.entries(subscriptions)) {
-      const lease = 10 * 24 * 60 * 60;
-      const { ok, status, statusText } = await subscribe({ id, lease });
-      if (!ok) throw new Error(`${status} ${statusText}`);
-      logger.log(`Subscribed "${name}"`);
+  const entries = Object.entries(subscriptions);
+  let successes = 0;
+  for (const [index, [name, id]] of entries.entries()) {
+    const progress = `${index + 1}/${entries.length}`;
+    const lease = 10 * 24 * 60 * 60;
+    // NOTE Intentionally sequential
+    // oxlint-disable-next-line eslint/no-await-in-loop
+    const response = await subscribe({ id, lease });
+    if (response.ok) {
+      logger.log(`Subscribed "${name}" ${progress}`);
+      successes += 1;
+      continue;
     }
-  } catch (error) {
-    logger.error(error);
-    return;
+    // oxlint-disable-next-line eslint/no-await-in-loop
+    const message = await response.text();
+    logger.error(`Could not subscribe "${name}" ${progress}`, `  ${message}`);
   }
-  return Promise.all([
+  await Promise.all([
     ...Object.keys(SERVERS).map((server) =>
+      // oxlint-disable-next-line typescript/no-unsafe-type-assertion
       Bot.log(server as keyof typeof SERVERS).success(
-        'Configured new subscriptions',
+        `Configured ${successes} out of ${entries.length} subscriptions`,
         '',
-        Object.entries(subscriptions),
+        entries,
       ),
     ),
-    Bot.status(`Watching ${Object.keys(subscriptions).length} subscriptions`),
+    Bot.status(`Watching ${successes} subscriptions`),
   ]);
 };
 
@@ -84,7 +91,8 @@ const subscribe = (options: {
  * the diagnostic endpoint.
  */
 // @ts-expect-error Unused by the program but kept for manual diagnostics
-const _diagnose = (options: {
+// oxlint-disable-next-line eslint/no-unused-vars
+const diagnose = (options: {
   /** The ID of the YouTube channel to diagnose */
   id: string;
   /** HMAC secret */

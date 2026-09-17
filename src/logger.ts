@@ -1,12 +1,14 @@
+import type { ChalkInstance } from 'chalk';
+
 import { Writable } from 'stream';
-import chalk, { type ChalkInstance } from 'chalk';
+import chalk from 'chalk';
 
 const DOMAINS =
   // prettier-ignore
   {
     BOT:      ['bot',      chalk.cyan],
     KARNNECT: ['karnnect', chalk.magenta],
-    ROOT:     ['process',  chalk.red],
+    ROOT:     ['root',     chalk.red],
     SERVER:   ['server',   chalk.yellow],
   } as const satisfies Record<
     Uppercase<string>,
@@ -15,17 +17,16 @@ const DOMAINS =
 
 export const Logger = (scope: keyof typeof DOMAINS) => {
   const [domain, colorize] = DOMAINS[scope];
-  const prefix = colorize(`[${domain}] `);
+  const prefix = colorize(`[${domain}]`);
 
   const write = (it: unknown, level: 'debug' | 'error') => {
+    if (!process.stdout.isTTY) {
+      console[level](prefix, it);
+      return;
+    }
     let output = '';
-    // NOTE Spawn a new stream for each log because I'm worried that `output`
-    //      might be messed up with concurrent calls but too lazy to actually
-    //      check whether that's the case.
-    //      If memory becomes an issue (it won't), pull it out into `Logger`
-    //      directly.
     const stream = new Writable({
-      write(chunk, _encoding, callback) {
+      write(chunk: Buffer | string, _encoding, callback) {
         output += chunk.toString();
         callback();
       },
@@ -40,7 +41,7 @@ export const Logger = (scope: keyof typeof DOMAINS) => {
     } else {
       logger.dir(it, { depth: null, colors: true });
     }
-    console[level](`${prefix}${output.trim().replaceAll('\n', `\n${prefix}`)}`);
+    console[level](prefix, output.trim().replaceAll('\n', `\n${prefix} `));
   };
 
   return {
