@@ -3,14 +3,16 @@ import type { EmbedOptions } from '~/bot/write';
 import { ActivityTypes, createBot } from '@discordeno/bot';
 
 import { SERVERS } from '~/bot/configuration';
-import { logger } from '~/bot/logger';
 import { embed, post } from '~/bot/write';
+import { logger as l } from '~/logger';
+
+const logger = l.child({ scope: 'bot' });
 
 if (!process.env.TOKEN) throw new Error('Missing token');
 
 const bot = createBot({
   events: {
-    ready: (payload) => logger.log('Bot is ready', payload),
+    ready: () => logger.info('Bot is ready'),
   },
   token: process.env.TOKEN,
 });
@@ -73,7 +75,7 @@ export const Bot = {
         activities: [{ name: 'Ready', state, type: ActivityTypes.Custom }],
         status: 'online',
       });
-      logger.log(`New status "${state}"`);
+      logger.info(`New status "${state}"`);
     } catch (error) {
       logger.error(error);
     }

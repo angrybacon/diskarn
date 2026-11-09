@@ -1,8 +1,10 @@
 import { Bot } from '~/bot/bot';
 import { SERVERS } from '~/bot/configuration';
 import { SUBSCRIPTIONS } from '~/karnnect/configuration';
-import { logger } from '~/karnnect/logger';
 import { SubscriptionsSchema } from '~/karnnect/schemas';
+import { logger as l } from '~/logger';
+
+const logger = l.child({ scope: 'karnnect' });
 
 if (!process.env.WEBSUB_CALLBACK_DOMAIN)
   throw new Error('Missing callback domain');
@@ -22,7 +24,7 @@ const URLS = {
 export const karnnect = async () => {
   const subscriptions = SubscriptionsSchema.parse(SUBSCRIPTIONS);
   if (process.env.SKIP_SUBSCRIPTION === '1') {
-    logger.log(`Dry-configured new subscriptions`, subscriptions);
+    logger.info('Dry-configured new subscriptions', { subscriptions });
     return;
   }
   const entries = Object.entries(subscriptions);
@@ -34,13 +36,13 @@ export const karnnect = async () => {
     // oxlint-disable-next-line eslint/no-await-in-loop
     const response = await subscribe({ id, lease });
     if (response.ok) {
-      logger.log(`Subscribed "${name}" ${progress}`);
+      logger.info(`Subscribed "${name}" ${progress}`);
       successes += 1;
       continue;
     }
     // oxlint-disable-next-line eslint/no-await-in-loop
-    const message = await response.text();
-    logger.error(`Could not subscribe "${name}" ${progress}`, `  ${message}`);
+    const body = await response.text();
+    logger.warn(`Could not subscribe "${name}" ${progress}`, { body });
   }
   await Promise.all([
     ...Object.keys(SERVERS).map((server) =>

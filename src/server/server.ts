@@ -7,7 +7,9 @@ import { xml2js } from 'xml-js';
 import { Bot } from '~/bot/bot';
 import { notificationsTable } from '~/database/schema';
 import { processChallenge } from '~/karnnect/processors';
-import { logger } from '~/server/logger';
+import { logger as l } from '~/logger';
+
+const logger = l.child({ scope: 'server' });
 
 if (!process.env.DATABASE_URL) throw new Error('Missing database URL');
 
@@ -16,7 +18,7 @@ const database = drizzle({
   connection: process.env.DATABASE_URL,
 });
 
-logger.log('Connected to PostgreSQL database');
+logger.info('Connected to PostgreSQL database');
 
 const f = Fastify().withTypeProvider<JsonSchemaToTsProvider>();
 
@@ -33,14 +35,12 @@ f.addContentTypeParser(
   },
 );
 
-f.addHook('onError', (_request, _reply, error) =>
-  logger.error(`An error occurred "${error.message}"`),
-);
+f.addHook('onError', (_request, _reply, error) => logger.error(error));
 
 f.get('/challenge', {
   handler: ({ query }) => {
     const challenge = query['hub.challenge'];
-    logger.log(`Verification challenge received "${challenge}"`);
+    logger.info(`Verification challenge received "${challenge}"`);
     return challenge;
   },
   schema: {
@@ -60,7 +60,8 @@ f.post('/challenge', async ({ body }) => {
       .values(notifications.map(({ id, server }) => ({ id, server })))
       .onConflictDoNothing()
       .returning();
-    logger.log(`Inserted ${rows.length} rows`, rows);
+    logger.info(`Inserted ${rows.length} rows`);
+    logger.debug(`Inserted ${rows.length} rows`, { rows });
     // NOTE Bounded by `CONFIGURATION.length`, a `Set` is never worth it
     // oxlint-disable-next-line unicorn/prefer-set-has
     const inserted = rows.map((row) => row.id);
@@ -68,7 +69,7 @@ f.post('/challenge', async ({ body }) => {
       if (inserted.includes(id)) {
         void Bot.post(server, notification.title, notification.link);
       } else {
-        logger.log(`Skipped ${server} notification, found "${id}" in database`);
+        logger.debug(`Skipped ${server} notification, "${id}" already exists`);
       }
     });
   }
@@ -77,7 +78,7 @@ f.post('/challenge', async ({ body }) => {
 
 f.get('/hello', () => {
   const message = 'Which Karn?';
-  logger.log(message);
+  logger.info(message);
   return message;
 });
 
@@ -90,9 +91,9 @@ export const Server = {
         host: process.env.HOST,
         port: Math.trunc(Number(process.env.PORT)),
       });
-      logger.log(`Server running on ${address}`);
+      logger.info(`Server running on ${address}`);
       const rows = await database.select().from(notificationsTable);
-      logger.log(`Found ${rows.length} existing rows in database`);
+      logger.info(`Found ${rows.length} existing rows in database`);
     } catch (error) {
       logger.error(error);
       process.exit(1);

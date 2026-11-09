@@ -16,11 +16,9 @@ export const SUBSCRIPTIONS =
     SEMIOTICIAN:     'UCZ0ERvBNUhBJ_yx3ewcRGFQ',
     THE_EPIC_STORM:  'UCajJn-d7ngRJwVh1YBmHzzw',
     // Other
-    DELBA:           'UCfDr-ppda0G5apw_zxG2ClQ',
     GOPARISM:        'UCCRdRbI93UGW0AZttVH3SbA',
     MATT_POCOCK:     'UCswG6FSbgZjbWtdf_hMLaow',
     PROTESILAOS:     'UC0uTPqBCFIpZxlz_Lv1tk_g',
-    T3DOTGG:         'UCbRP3c757lWg9M-U7TyEkXA',
   } as const satisfies Record<string, string>;
 
 export const CONFIGURATION: {
@@ -34,6 +32,7 @@ export const CONFIGURATION: {
     subscriptions: [
       SUBSCRIPTIONS.DDFT_GUY,
       SUBSCRIPTIONS.DOISHY,
+      SUBSCRIPTIONS.EUREKA_22422,
       SUBSCRIPTIONS.JAMES_KISAU,
       SUBSCRIPTIONS.NEVILSHUTE,
       SUBSCRIPTIONS.REVENANTKIOKU,
@@ -45,6 +44,7 @@ export const CONFIGURATION: {
   {
     server: 'KORUMITE',
     subscriptions: [
+      SUBSCRIPTIONS.GOPARISM,
       SUBSCRIPTIONS.JUDGING_FTW,
       SUBSCRIPTIONS.MATT_POCOCK,
       SUBSCRIPTIONS.PROTESILAOS,

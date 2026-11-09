@@ -2,20 +2,20 @@ import type { Notification } from '~/karnnect/schemas';
 
 import { SERVERS } from '~/bot/configuration';
 import { CONFIGURATION } from '~/karnnect/configuration';
-import { logger } from '~/karnnect/logger';
 import { NotificationSchema } from '~/karnnect/schemas';
+import { logger as l } from '~/logger';
+
+const logger = l.child({ scope: 'karnnect' });
 
 export const processChallenge = (response: unknown) => {
   try {
-    if (process.env.VERBOSE === '1') {
-      logger.log('Received new challenge response', response);
-    }
+    logger.debug('Received new challenge response', { response });
     const notification = NotificationSchema.parse(response);
     const matches = Object.values(CONFIGURATION).filter(({ subscriptions }) =>
       subscriptions.includes(notification.channelId),
     );
     if (!matches.length) {
-      logger.error('Unhandled notification', notification);
+      logger.warn('Unhandled notification', { notification });
     }
     return matches.reduce<
       {
@@ -25,7 +25,7 @@ export const processChallenge = (response: unknown) => {
       }[]
     >((accumulator, { filter, server }) => {
       if (filter && !filter.test(notification.title)) {
-        logger.log(`Skipped ${server} notification, title did not match`);
+        logger.debug(`Skipped ${server} notification, title did not match`);
         return accumulator;
       }
       accumulator.push({ id: notification.videoId, notification, server });
@@ -33,7 +33,7 @@ export const processChallenge = (response: unknown) => {
     }, []);
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
-    logger.error(`Could not read notification "${message}"`, response);
+    logger.error(`Could not read notification "${message}"`, { response });
   }
   return [];
 };

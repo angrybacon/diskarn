@@ -15,8 +15,6 @@ vi.mock('~/bot/bot', () => ({
 
 vi.mock('~/karnnect/configuration', () => configuration);
 
-vi.mock('~/karnnect/logger');
-
 describe(karnnect, () => {
   beforeEach(() => {
     configuration.SUBSCRIPTIONS = { TEST_CHANNEL: 'A'.repeat(24) };

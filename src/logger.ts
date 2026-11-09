@@ -1,53 +1,24 @@
-import type { ChalkInstance } from 'chalk';
+import { inspect } from 'util';
+import winston from 'winston';
 
-import { Writable } from 'stream';
-import chalk from 'chalk';
+const { colorize, combine, errors, json, printf } = winston.format;
 
-const DOMAINS =
-  // prettier-ignore
-  {
-    BOT:      ['bot',      chalk.cyan],
-    KARNNECT: ['karnnect', chalk.magenta],
-    ROOT:     ['root',     chalk.red],
-    SERVER:   ['server',   chalk.yellow],
-  } as const satisfies Record<
-    Uppercase<string>,
-    [Lowercase<string>, ChalkInstance]
-  >;
-
-export const Logger = (scope: keyof typeof DOMAINS) => {
-  const [domain, colorize] = DOMAINS[scope];
-  const prefix = colorize(`[${domain}]`);
-
-  const write = (it: unknown, level: 'debug' | 'error') => {
-    if (!process.stdout.isTTY) {
-      console[level](prefix, it);
-      return;
-    }
-    let output = '';
-    const stream = new Writable({
-      write(chunk: Buffer | string, _encoding, callback) {
-        output += chunk.toString();
-        callback();
-      },
-    });
-    const logger = new console.Console({ stdout: stream });
-    output = '';
-    if (it instanceof Error) {
-      logger.log(it.message);
-      logger.dir(it.cause, { depth: null, colors: true });
-    } else if (typeof it === 'string') {
-      logger.log(it);
-    } else {
-      logger.dir(it, { depth: null, colors: true });
-    }
-    console[level](prefix, output.trim().replaceAll('\n', `\n${prefix} `));
-  };
-
-  return {
-    error: (...messages: unknown[]) =>
-      messages.forEach((it) => write(it, 'error')),
-    log: (...messages: unknown[]) =>
-      messages.forEach((it) => write(it, 'debug')),
-  };
-};
+export const logger = winston.createLogger({
+  format:
+    process.stdout.isTTY &&
+    // NOTE Never colorize in production, even if a TTY happens to be attached
+    process.env.NODE_ENV !== 'production'
+      ? combine(
+          errors({ stack: true }),
+          colorize(),
+          printf(({ level, message, scope, ...rest }) => {
+            const details = Object.keys(rest).length
+              ? ` ${inspect(rest, { colors: true, depth: null })}`
+              : '';
+            return `[${String(scope)}] ${level} ${String(message)}${details}`;
+          }),
+        )
+      : combine(errors({ stack: true }), json()),
+  level: process.env.VERBOSE === '1' ? 'debug' : 'info',
+  transports: [new winston.transports.Console()],
+});

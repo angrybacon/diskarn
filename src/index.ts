@@ -2,17 +2,19 @@ import { scheduleJob } from 'node-schedule';
 
 import { Bot } from '~/bot/bot';
 import { karnnect } from '~/karnnect/karnnect';
-import { Logger } from '~/logger';
+import { logger as l } from '~/logger';
 import { Server } from '~/server/server';
 
-const logger = Logger('ROOT');
+const logger = l.child({ scope: 'root' });
 
 process.on('uncaughtException', (error) => {
   logger.error(error);
   process.exit(1);
 });
 
-process.on('unhandledRejection', (reason) => logger.error(reason));
+process.on('unhandledRejection', (reason) => {
+  logger.error(reason);
+});
 
 await Promise.all([Bot.start(), Server.start()]);
 

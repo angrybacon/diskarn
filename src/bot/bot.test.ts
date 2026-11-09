@@ -1,11 +1,10 @@
 import { describe, expect, it, vi } from 'vitest';
 
 import { Bot } from '~/bot/bot';
-import { logger } from '~/bot/logger';
 import { embed, post } from '~/bot/write';
+import { logger } from '~/logger';
 
 vi.mock('@discordeno/bot');
-vi.mock('~/bot/logger');
 vi.mock('~/bot/write');
 
 // NOTE `bot.ts` reads `TOKEN` at import time
